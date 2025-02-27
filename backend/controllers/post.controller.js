@@ -10,7 +10,7 @@ exports.addNewPost = async (req, res) => {
         const { caption } = req.body;
         const image = req.file;
         const authorId = req.id;
-
+        // console.log(caption, image, authorId)
         if (!image) return res.status(400).json({ message: 'Image required' });
 
         // Optimize image using sharp
@@ -109,6 +109,7 @@ exports.likePost = async (req, res) => {
     try {
         const likeKrneWalaUserKiId = req.id;
         const postId = req.params.id;
+        console.log(likeKrneWalaUserKiId, postId)
         const post = await Post.findById(postId);
         if (!post) return res.status(404).json({ message: 'Post not found', success: false });
 
@@ -233,12 +234,22 @@ exports.deletePost = async (req, res) => {
 
         if (post.author.toString() !== authorId) return res.status(403).json({ message: 'Unauthorized' });
 
+        // Extract public ID from Cloudinary URL
+        const imageUrl = post.image;
+        const publicId = imageUrl.split('/').pop().split('.')[0];
+
+        // Delete image from Cloudinary
+        await cloudinary.uploader.destroy(`${process.env.FOLDER_NAME}/${publicId}`);
+
+        // Delete post from database
         await Post.findByIdAndDelete(postId);
 
+        // Remove post reference from user
         let user = await User.findById(authorId);
         user.posts = user.posts.filter(id => id.toString() !== postId);
         await user.save();
 
+        // Delete associated comments
         await Comment.deleteMany({ post: postId });
 
         return res.status(200).json({
@@ -247,9 +258,11 @@ exports.deletePost = async (req, res) => {
         });
 
     } catch (error) {
-        console.log(error);
+        console.log("Error in deletePost:", error);
+        res.status(500).json({ message: 'Internal Server Error' });
     }
 };
+
 
 exports.bookmarkPost = async (req, res) => {
     try {

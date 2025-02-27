@@ -42,8 +42,6 @@ const Profile = () => {
                   isLoggedInUserProfile ? (
                     <>
                       <Link to="/account/edit"><Button variant='secondary' className='hover:bg-gray-200 h-8'>Edit profile</Button></Link>
-                      <Button variant='secondary' className='hover:bg-gray-200 h-8'>View archive</Button>
-                      <Button variant='secondary' className='hover:bg-gray-200 h-8'>Ad tools</Button>
                     </>
                   ) : (
                     isFollowing ? (

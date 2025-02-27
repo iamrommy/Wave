@@ -84,7 +84,7 @@ function App() {
 
   return (
     <>
-      <RouterProvider router={browserRouter} />
+      <RouterProvider router={browserRouter}/>
     </>
   )
 }
