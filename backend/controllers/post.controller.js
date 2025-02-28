@@ -109,7 +109,7 @@ exports.likePost = async (req, res) => {
     try {
         const likeKrneWalaUserKiId = req.id;
         const postId = req.params.id;
-        console.log(likeKrneWalaUserKiId, postId)
+        // console.log(likeKrneWalaUserKiId, postId)
         const post = await Post.findById(postId);
         if (!post) return res.status(404).json({ message: 'Post not found', success: false });
 
@@ -271,19 +271,23 @@ exports.bookmarkPost = async (req, res) => {
         const post = await Post.findById(postId);
         if (!post) return res.status(404).json({ message: 'Post not found', success: false });
 
-        const user = await User.findById(authorId);
-        const action = user.bookmarks.includes(post._id) ? '$pull' : '$addToSet';
+        const action = (await User.findById(authorId)).bookmarks.includes(post._id) ? '$pull' : '$addToSet';
 
-        await user.updateOne({ [action]: { bookmarks: post._id } });
-        await user.save();
-
+        const updatedUser = await User.findByIdAndUpdate(
+            authorId,
+            { [action]: { bookmarks: post._id } },
+            { new: true } // This ensures the updated document is returned
+        );
         return res.status(200).json({
             type: action === '$pull' ? 'unsaved' : 'saved',
-            message: action === '$pull' ? 'Post removed from bookmark' : 'Post bookmarked',
-            success: true
+            message: action === '$pull' ? 'Post removed from bookmarks' : 'Post bookmarked',
+            success: true,
+            user: updatedUser // Now it contains the latest bookmarks array
         });
 
     } catch (error) {
         console.log(error);
+        return res.status(500).json({ message: 'Something went wrong', success: false });
     }
 };
+

@@ -2,25 +2,61 @@ import React, { useState } from 'react'
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar'
 import useGetUserProfile from '@/hooks/useGetUserProfile';
 import { Link, useParams } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { Button } from './ui/button';
-import { Badge } from './ui/badge';
 import { AtSign, Heart, MessageCircle } from 'lucide-react';
+import axios from 'axios';
+import { toast } from 'sonner';
+import { setAuthUser, setUserProfile } from '../redux/authSlice';
 
 const Profile = () => {
   const params = useParams();
   const userId = params.id;
   useGetUserProfile(userId);
   const [activeTab, setActiveTab] = useState('posts');
+  const [loading, setLoading] = useState(false);
+  const dispatch = useDispatch();
 
   const { userProfile, user } = useSelector(store => store.auth);
 
   const isLoggedInUserProfile = user?._id === userProfile?._id;
-  const isFollowing = false;
+  // const [isFollowing, setIsFollowing] = useState(userProfile.followers?.includes(user?._id));
 
   const handleTabChange = (tab) => {
     setActiveTab(tab);
   }
+
+  const followOrUnfollow = async () => {
+    try {
+        setLoading(true);
+        const res = await axios.post(
+            `${import.meta.env.VITE_APP_BASE_URL}/user/followorunfollow/${userId}`, 
+            {}, 
+            { withCredentials: true }
+        );
+        if (res.data.success) {
+            const updatedTargetUserData = {
+              ...userProfile,
+              following: res.data.targetUser?.following,
+              followers: res.data.targetUser?.followers,
+            }
+            dispatch(setUserProfile(updatedTargetUserData));
+
+            const updatedUserData = {
+                ...user,
+                following: res.data.user?.following,
+                followers: res.data.user?.followers,
+            };
+            dispatch(setAuthUser(updatedUserData));
+            toast.success(res.data.message);
+        }
+    } catch (error) {
+        console.log(error);
+        toast.error(error.response?.data?.message || "Something went wrong"); 
+    } finally {
+        setLoading(false);
+    }
+  };
 
   const displayedPost = activeTab === 'posts' ? userProfile?.posts : userProfile?.bookmarks;
 
@@ -44,26 +80,30 @@ const Profile = () => {
                       <Link to="/account/edit"><Button variant='secondary' className='hover:bg-gray-200 h-8'>Edit profile</Button></Link>
                     </>
                   ) : (
-                    isFollowing ? (
-                      <>
-                        <Button variant='secondary' className='h-8'>Unfollow</Button>
-                        <Button variant='secondary' className='h-8'>Message</Button>
-                      </>
+                    userProfile.followers?.includes(user?._id) ? (
+                      <Button variant='destructive' className='h-8' onClick={followOrUnfollow}>
+                        {
+                          loading ? (<span className="loader"></span>) : (<span>Unfollow</span>)
+                        }
+                      </Button>
                     ) : (
-                      <Button className='bg-[#0095F6] hover:bg-[#3192d2] h-8'>Follow</Button>
+                      <Button variant='secondary' className='bg-[#0095F6] hover:bg-[#3192d2] h-8' onClick={followOrUnfollow}>
+                        {
+                          loading ? (<span className="loader"></span>) : (<span>Follow</span>)
+                        }
+                      </Button>
                     )
                   )
                 }
               </div>
               <div className='flex items-center gap-4'>
-                <p><span className='font-semibold'>{userProfile?.posts.length} </span>posts</p>
-                <p><span className='font-semibold'>{userProfile?.followers.length} </span>followers</p>
-                <p><span className='font-semibold'>{userProfile?.following.length} </span>following</p>
+                <p><span className='font-semibold'>{userProfile?.posts?.length} </span>posts</p>
+                <p><span className='font-semibold'>{userProfile?.followers?.length} </span>followers</p>
+                <p><span className='font-semibold'>{userProfile?.following?.length} </span>following</p>
               </div>
               <div className='flex flex-col gap-1'>
                 <span className='font-semibold'>{userProfile?.bio || 'bio here...'}</span>
-                <Badge className='w-fit' variant='secondary'><AtSign /> <span className='pl-1'>{userProfile?.username}</span> </Badge>
-                <span>🤯Learn code with patel mernstack style</span>
+                <span>🤯Learn code with mernstack style</span>
                 <span>🤯Turing code into fun</span>
                 <span>🤯DM for collaboration</span>
               </div>
@@ -78,8 +118,6 @@ const Profile = () => {
             <span className={`py-3 cursor-pointer ${activeTab === 'saved' ? 'font-bold' : ''}`} onClick={() => handleTabChange('saved')}>
               SAVED
             </span>
-            <span className='py-3 cursor-pointer'>REELS</span>
-            <span className='py-3 cursor-pointer'>TAGS</span>
           </div>
           <div className='grid grid-cols-3 gap-1'>
             {

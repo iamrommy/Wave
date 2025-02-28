@@ -87,12 +87,12 @@ const EditProfile = () => {
                 </div>
                 <div>
                     <h1 className='font-bold text-xl mb-2'>Bio</h1>
-                    <Textarea value={input.bio} onChange={(e) => setInput({ ...input, bio: e.target.value })} name='bio' className="focus-visible:ring-transparent" />
+                    <Textarea value={input.bio} onChange={(e) => setInput({ ...input, bio: e.target.value })} name='bio' className="focus-visible:ring-transparent text-white" />
                 </div>
                 <div>
                     <h1 className='font-bold mb-2'>Gender</h1>
-                    <Select defaultValue={input.gender} onValueChange={selectChangeHandler}>
-                        <SelectTrigger className="w-full">
+                    <Select defaultValue={input.gender} onValueChange={selectChangeHandler} className="text-white">
+                        <SelectTrigger className="w-full text-white">
                             <SelectValue />
                         </SelectTrigger>
                         <SelectContent>

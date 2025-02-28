@@ -60,7 +60,7 @@ const CommentDialog = ({ open, setOpen }) => {
   return (
     <Dialog open={open}>
       <DialogContent onInteractOutside={() => setOpen(false)} className="max-w-5xl p-0 flex flex-col">
-        <div className='flex flex-1'>
+        <div className='flex flex-1 text-gray-200'>
           <div className='w-1/2'>
             <img
               src={selectedPost?.image}

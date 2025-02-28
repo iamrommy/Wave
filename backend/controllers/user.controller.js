@@ -2,6 +2,8 @@ const User = require("../models/user.model.js");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const getDataUri = require("../utils/datauri.js");
+const sharp = require('sharp');
+const fs = require('fs');
 const cloudinary = require("../utils/cloudinary.js");
 const Post = require("../models/post.model.js");
 
@@ -77,7 +79,9 @@ const login = async (req, res) => {
             username: user.username,
             email: user.email,
             profilePicture: user.profilePicture,
-            bio: user.bio,
+            bio: user?.bio,
+            bookmarks: user?.bookmarks,
+            gender: user?.gender,
             followers: user.followers,
             following: user.following,
             posts: populatedPosts
@@ -206,6 +210,7 @@ const followOrUnfollow = async (req, res) => {
     try {
         const followKrneWala = req.id;
         const jiskoFollowKrunga = req.params.id;
+
         if (followKrneWala === jiskoFollowKrunga) {
             return res.status(400).json({
                 message: 'You cannot follow/unfollow yourself',
@@ -213,8 +218,8 @@ const followOrUnfollow = async (req, res) => {
             });
         }
 
-        const user = await User.findById(followKrneWala);
-        const targetUser = await User.findById(jiskoFollowKrunga);
+        let user = await User.findById(followKrneWala);
+        let targetUser = await User.findById(jiskoFollowKrunga);
 
         if (!user || !targetUser) {
             return res.status(400).json({
@@ -224,22 +229,24 @@ const followOrUnfollow = async (req, res) => {
         }
 
         const isFollowing = user.following.includes(jiskoFollowKrunga);
+
         if (isFollowing) {
-            await Promise.all([
-                User.updateOne({ _id: followKrneWala }, { $pull: { following: jiskoFollowKrunga } }),
-                User.updateOne({ _id: jiskoFollowKrunga }, { $pull: { followers: followKrneWala } }),
-            ]);
-            return res.status(200).json({ message: 'Unfollowed successfully', success: true });
+            // Unfollow
+            user = await User.findByIdAndUpdate(followKrneWala, { $pull: { following: jiskoFollowKrunga } }, { new: true });
+            targetUser = await User.findByIdAndUpdate(jiskoFollowKrunga, { $pull: { followers: followKrneWala } }, { new: true });
+            return res.status(200).json({ message: 'Unfollowed successfully', success: true, user, targetUser});
         } else {
-            await Promise.all([
-                User.updateOne({ _id: followKrneWala }, { $push: { following: jiskoFollowKrunga } }),
-                User.updateOne({ _id: jiskoFollowKrunga }, { $push: { followers: followKrneWala } }),
-            ]);
-            return res.status(200).json({ message: 'Followed successfully', success: true });
+            // Follow
+            user = await User.findByIdAndUpdate(followKrneWala, { $push: { following: jiskoFollowKrunga } }, { new: true });
+            targetUser = await User.findByIdAndUpdate(jiskoFollowKrunga, { $push: { followers: followKrneWala } }, { new: true });
+
+            return res.status(200).json({ message: 'Followed successfully', success: true, user, targetUser });
         }
     } catch (error) {
-        console.log(error);
+        console.error(error);
+        return res.status(500).json({ message: 'Internal Server Error', success: false });
     }
 };
+
 
 module.exports = { register, login, logout, getProfile, editProfile, getSuggestedUsers, followOrUnfollow };

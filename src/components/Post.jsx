@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar'
 import { Dialog, DialogContent, DialogTrigger } from './ui/dialog'
 import { Bookmark, MessageCircle, MoreHorizontal, Send } from 'lucide-react'
+import { FaBookmark, FaRegBookmark  } from "react-icons/fa";
 import { Button } from './ui/button'
 import { FaHeart, FaRegHeart } from "react-icons/fa";
 import CommentDialog from './CommentDialog'
@@ -10,15 +11,16 @@ import axios from 'axios'
 import { toast } from 'sonner'
 import { setPosts, setSelectedPost } from '@/redux/postSlice'
 import { Badge } from './ui/badge'
+import { setAuthUser } from '../redux/authSlice';
 
 const Post = ({ post }) => {
     const [text, setText] = useState("");
     const [open, setOpen] = useState(false);
     const { user } = useSelector(store => store.auth);
+    // console.log(user);
     const { posts } = useSelector(store => store.post);
     const [liked, setLiked] = useState(post.likes.includes(user?._id) || false);
     const [postLike, setPostLike] = useState(post.likes.length);
-    const [comment, setComment] = useState(post.comments);
     const dispatch = useDispatch();
 
     const changeEventHandler = (e) => {
@@ -34,7 +36,7 @@ const Post = ({ post }) => {
         try {
             const action = liked ? 'dislike' : 'like';
             const res = await axios.get(`${import.meta.env.VITE_APP_BASE_URL}/post/${post._id}/${action}`, { withCredentials: true });
-            console.log(res.data);
+            // console.log(res.data);
             if (res.data.success) {
                 const updatedLikes = liked ? postLike - 1 : postLike + 1;
                 setPostLike(updatedLikes);
@@ -64,10 +66,8 @@ const Post = ({ post }) => {
                 },
                 withCredentials: true
             });
-            console.log(res.data);
             if (res.data.success) {
-                const updatedCommentData = [...comment, res.data.comment];
-                setComment(updatedCommentData);
+                const updatedCommentData = [...post.comments, res.data.comment];
 
                 const updatedPostData = posts.map(p =>
                     p._id === post._id ? { ...p, comments: updatedCommentData } : p
@@ -98,14 +98,18 @@ const Post = ({ post }) => {
 
     const bookmarkHandler = async () => {
         try {
-            const res = await axios.get(`${import.meta.env.VITE_APP_BASE_URL}/post/${post?._id}/bookmark`, {withCredentials:true});
-            if(res.data.success){
+            const res = await axios.get(`${import.meta.env.VITE_APP_BASE_URL}/post/${post?._id}/bookmark`, { withCredentials: true });
+    
+            if (res.data.success) {
+                dispatch(setAuthUser(res.data?.user));
                 toast.success(res.data.message);
             }
         } catch (error) {
             console.log(error);
+            toast.error("Failed to update bookmark status");
         }
-    }
+    };
+    
     return (
         <div className='my-8 w-full max-w-sm mx-auto'>
             <div className='flex items-center justify-between'>
@@ -123,7 +127,7 @@ const Post = ({ post }) => {
                     <DialogTrigger asChild>
                         <MoreHorizontal className='cursor-pointer' />
                     </DialogTrigger>
-                    <DialogContent className="flex flex-col items-center text-sm text-center">
+                    <DialogContent className="flex flex-col items-center text-sm text-center text-gray-400">
                         {
                         post?.author?._id !== user?._id && <Button variant='ghost' className="cursor-pointer w-fit text-[#ED4956] font-bold">Unfollow</Button>
                         }
@@ -151,9 +155,12 @@ const Post = ({ post }) => {
                         dispatch(setSelectedPost(post));
                         setOpen(true);
                     }} className='cursor-pointer hover:text-gray-600' />
-                    <Send className='cursor-pointer hover:text-gray-600' />
                 </div>
-                <Bookmark onClick={bookmarkHandler} className='cursor-pointer hover:text-gray-600' />
+                {
+                    user.bookmarks?.includes(post._id) ?
+                    (<FaBookmark  onClick={bookmarkHandler} className='cursor-pointer hover:text-gray-600' /> )
+                    : (<FaRegBookmark  onClick={bookmarkHandler} className='cursor-pointer hover:text-gray-600' /> )
+                }
             </div>
             <span className='font-medium block mb-2'>{postLike} likes</span>
             <p>
@@ -161,11 +168,11 @@ const Post = ({ post }) => {
                 {post.caption}
             </p>
             {
-                comment.length > 0 && (
+                post.comments.length > 0 && (
                     <span onClick={() => {
                         dispatch(setSelectedPost(post));
                         setOpen(true);
-                    }} className='cursor-pointer text-sm text-gray-400'>View all {comment.length} comments</span>
+                    }} className='cursor-pointer text-sm text-gray-400'>View all {post.comments.length} comments</span>
                 )
             }
             <CommentDialog open={open} setOpen={setOpen} />

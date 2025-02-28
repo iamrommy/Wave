@@ -56,18 +56,18 @@ const CreatePost = ({ open, setOpen }) => {
   return (
     <Dialog open={open}>
       <DialogContent onInteractOutside={() => setOpen(false)}>
-        <DialogHeader className='text-center font-semibold'>Create New Post</DialogHeader>
+        <DialogHeader className='text-center font-semibold text-white'>Create New Post</DialogHeader>
         <div className='flex gap-3 items-center'>
           <Avatar>
             <AvatarImage src={user?.profilePicture} alt="img" />
             <AvatarFallback>CN</AvatarFallback>
           </Avatar>
-          <div>
+          <div className='text-gray-200'>
             <h1 className='font-semibold text-xs'>{user?.username}</h1>
             <span className='text-gray-600 text-xs'>Bio here...</span>
           </div>
         </div>
-        <Textarea value={caption} onChange={(e) => setCaption(e.target.value)} className="focus-visible:ring-transparent border-none" placeholder="Write a caption..." />
+        <Textarea value={caption} onChange={(e) => setCaption(e.target.value)} className="focus-visible:ring-transparent border-none text-white" placeholder="Write a caption..." />
         {
           imagePreview && (
             <div className='w-full h-64 flex items-center justify-center'>
