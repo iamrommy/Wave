@@ -86,13 +86,16 @@ const login = async (req, res) => {
             following: user.following,
             posts: populatedPosts
         };
-        return res.cookie('token', token, { httpOnly: true, sameSite: 'strict', 
-            // maxAge: 1 * 24 * 60 * 60 * 1000 
+        return res.cookie('token', token, { 
+            httpOnly: true, 
+            secure: true,  // Ensure secure cookies are sent over HTTPS
+            sameSite: 'none',  // Allow cookies to be sent across different origins
         }).json({
             message: `Welcome back ${user.username}`,
             success: true,
             user
         });
+        
     } catch (error) {
         console.log(error);
     }
