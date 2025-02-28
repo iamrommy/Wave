@@ -80,7 +80,7 @@ const Profile = () => {
                       <Link to="/account/edit"><Button variant='secondary' className='hover:bg-gray-200 h-8'>Edit profile</Button></Link>
                     </>
                   ) : (
-                    userProfile.followers?.includes(user?._id) ? (
+                    userProfile?.followers?.includes(user?._id) ? (
                       <Button variant='destructive' className='h-8' onClick={followOrUnfollow}>
                         {
                           loading ? (<span className="loader"></span>) : (<span>Unfollow</span>)
