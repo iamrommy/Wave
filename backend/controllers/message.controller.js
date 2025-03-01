@@ -8,7 +8,11 @@ const sendMessage = async (req, res) => {
         const senderId = req.id;
         const receiverId = req.params.id;
         const { textMessage: message } = req.body;
-      
+
+        if (!message) {
+            return res.status(400).json({ success: false, error: "Message is required" });
+        }
+
         let conversation = await Conversation.findOne({
             participants: { $all: [senderId, receiverId] }
         });
@@ -16,7 +20,8 @@ const sendMessage = async (req, res) => {
         // Establish the conversation if not started yet.
         if (!conversation) {
             conversation = await Conversation.create({
-                participants: [senderId, receiverId]
+                participants: [senderId, receiverId],
+                messages: []
             });
         }
 
@@ -26,7 +31,12 @@ const sendMessage = async (req, res) => {
             message
         });
 
-        if (newMessage) conversation.messages.push(newMessage._id);
+        // Ensure conversation.messages is an array
+        if (!Array.isArray(conversation.messages)) {
+            conversation.messages = [];
+        }
+
+        conversation.messages.push(newMessage._id);
 
         await Promise.all([conversation.save(), newMessage.save()]);
 
@@ -41,7 +51,8 @@ const sendMessage = async (req, res) => {
             newMessage
         });
     } catch (error) {
-        console.error(error);
+        console.error("Error in sendMessage:", error);
+        return res.status(500).json({ success: false, error: "Internal Server Error" });
     }
 };
 
@@ -61,7 +72,8 @@ const getMessage = async (req, res) => {
 
         return res.status(200).json({ success: true, messages: conversation.messages });
     } catch (error) {
-        console.error(error);
+        console.error("Error in getMessage:", error);
+        return res.status(500).json({ success: false, error: "Internal Server Error" });
     }
 };
 
