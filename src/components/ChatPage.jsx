@@ -8,6 +8,7 @@ import { MessageCircleCode } from 'lucide-react';
 import Messages from './Messages';
 import axios from 'axios';
 import { setMessages } from '@/redux/chatSlice';
+import socket from '../utils/socket';
 
 const ChatPage = () => {
     const [textMessage, setTextMessage] = useState("");
@@ -31,12 +32,49 @@ const ChatPage = () => {
             console.log(error);
         }
     }
-
+    
+    // const sendMessageHandler = async (receiverId) => {
+    //     try {
+    //         const res = await axios.post(`${import.meta.env.VITE_APP_BASE_URL}/message/send/${receiverId}`, 
+    //         { textMessage }, 
+    //         {
+    //             headers: {
+    //                 'Content-Type': 'application/json'
+    //             },
+    //             withCredentials: true
+    //         });
+    
+    //         if (res.data.success) {
+    //             if (selectedUser?._id === receiverId) {
+    //                 dispatch(setMessages([...messages, res.data.newMessage]));
+    //             }
+    //             setTextMessage("");
+    //         }
+    //     } catch (error) {
+    //         console.log(error);
+    //     }
+    // };
+    
+    
+    // useEffect(() => {
+    //     return () => {
+    //         dispatch(setSelectedUser(null));
+    //     }
+    // },[]);
     useEffect(() => {
+        const handleNewMessage = (newMessage) => {
+            if (selectedUser?._id === newMessage.senderId) {
+                dispatch(setMessages(newMessage));
+            }
+        };
+    
+        socket.on("newMessage", handleNewMessage);
+    
         return () => {
-            dispatch(setSelectedUser(null));
-        }
-    },[]);
+            socket.off("newMessage", handleNewMessage);
+        };
+    }, [selectedUser, dispatch]);
+    
 
     return (
         <div className='flex ml-[16%] h-screen'>
