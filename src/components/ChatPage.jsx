@@ -48,18 +48,25 @@ const ChatPage = () => {
                         suggestedUsers.map((suggestedUser) => {
                             const isOnline = onlineUsers.includes(suggestedUser?._id);
                             return (
-                                <div onClick={() => dispatch(setSelectedUser(suggestedUser))} className='flex gap-3 items-center p-3 hover:bg-gray-50 cursor-pointer'>
+                                <div 
+                                    key={suggestedUser?._id}  // ✅ Added unique key prop here
+                                    onClick={() => dispatch(setSelectedUser(suggestedUser))} 
+                                    className='flex gap-3 items-center p-3 hover:bg-gray-50 cursor-pointer'
+                                >
                                     <Avatar className='w-14 h-14'>
                                         <AvatarImage src={suggestedUser?.profilePicture} />
                                         <AvatarFallback>CN</AvatarFallback>
                                     </Avatar>
                                     <div className='flex flex-col'>
                                         <span className='font-medium'>{suggestedUser?.username}</span>
-                                        <span className={`text-xs font-bold ${isOnline ? 'text-green-600' : 'text-red-600'} `}>{isOnline ? 'online' : 'offline'}</span>
+                                        <span className={`text-xs font-bold ${isOnline ? 'text-green-600' : 'text-red-600'} `}>
+                                            {isOnline ? 'online' : 'offline'}
+                                        </span>
                                     </div>
                                 </div>
                             )
                         })
+                        
                     }
                 </div>
 
