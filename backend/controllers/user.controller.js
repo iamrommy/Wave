@@ -47,7 +47,11 @@ const login = async (req, res) => {
                 success: false,
             });
         }
-        let user = await User.findOne({ email });
+        let user = await User.findOne({ email })
+                            .populate('following')
+                            .populate('followers')
+                            .exec();
+
         if (!user) {
             return res.status(401).json({
                 message: "Incorrect email or password",
@@ -115,7 +119,12 @@ const logout = async (_, res) => {
 const getProfile = async (req, res) => {
     try {
         const userId = req.params.id;
-        let user = await User.findById(userId).populate({ path: 'posts', createdAt: -1 }).populate('bookmarks');
+        let user = await User.findById(userId)
+                        .populate({ path: 'posts', options: { sort: { createdAt: -1 } } })
+                        .populate('bookmarks')
+                        .populate('followers')
+                        .populate('following')
+                        .exec();
         return res.status(200).json({
             user,
             success: true
@@ -194,18 +203,32 @@ const editProfile = async (req, res) => {
 
 const getSuggestedUsers = async (req, res) => {
     try {
-        const suggestedUsers = await User.find({ _id: { $ne: req.id } }).select("-password");
-        if (!suggestedUsers) {
+        // Fetch the logged-in user to get the list of users they've followed
+        const loggedInUser = await User.findById(req.id).select("following");
+
+        if (!loggedInUser) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        // Exclude logged-in user and already followed users
+        const suggestedUsers = await User.find({
+            _id: { $ne: req.id, $nin: loggedInUser.following }
+        }).select("-password");
+
+        if (suggestedUsers.length === 0) {
             return res.status(400).json({
-                message: 'Currently do not have any users',
+                message: 'No suggested users available',
             });
         }
+
         return res.status(200).json({
             success: true,
             users: suggestedUsers
         });
+
     } catch (error) {
         console.log(error);
+        res.status(500).json({ message: "Internal Server Error" });
     }
 };
 
@@ -235,21 +258,37 @@ const followOrUnfollow = async (req, res) => {
 
         if (isFollowing) {
             // Unfollow
-            user = await User.findByIdAndUpdate(followKrneWala, { $pull: { following: jiskoFollowKrunga } }, { new: true });
-            targetUser = await User.findByIdAndUpdate(jiskoFollowKrunga, { $pull: { followers: followKrneWala } }, { new: true });
-            return res.status(200).json({ message: 'Unfollowed successfully', success: true, user, targetUser});
+            user = await User.findByIdAndUpdate(followKrneWala, { $pull: { following: jiskoFollowKrunga } }, {new:true});
+            await User.findByIdAndUpdate(jiskoFollowKrunga, { $pull: { followers: followKrneWala } });
+
         } else {
             // Follow
-            user = await User.findByIdAndUpdate(followKrneWala, { $push: { following: jiskoFollowKrunga } }, { new: true });
-            targetUser = await User.findByIdAndUpdate(jiskoFollowKrunga, { $push: { followers: followKrneWala } }, { new: true });
-
-            return res.status(200).json({ message: 'Followed successfully', success: true, user, targetUser });
+            user = await User.findByIdAndUpdate(followKrneWala, { $push: { following: jiskoFollowKrunga } }, {new:true});
+            await User.findByIdAndUpdate(jiskoFollowKrunga, { $push: { followers: followKrneWala } });
         }
+
+        // Populate targetUser's followers and following
+        targetUser = await User.findById(jiskoFollowKrunga)
+            .populate('followers')
+            .populate('following');
+        
+        user = await User.findById(followKrneWala)
+            .populate('followers')
+            .populate('following');
+        
+        return res.status(200).json({ 
+            message: isFollowing ? 'Unfollowed successfully' : 'Followed successfully',
+            success: true,
+            user,
+            targetUser
+        });
+
     } catch (error) {
         console.error(error);
         return res.status(500).json({ message: 'Internal Server Error', success: false });
     }
 };
+
 
 
 module.exports = { register, login, logout, getProfile, editProfile, getSuggestedUsers, followOrUnfollow };

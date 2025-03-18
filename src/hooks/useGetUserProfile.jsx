@@ -12,7 +12,6 @@ const useGetUserProfile = (userId) => {
             try {
                 const res = await axios.get(`${import.meta.env.VITE_APP_BASE_URL}/user/${userId}/profile`, { withCredentials: true });
                 if (res.data.success) { 
-                    // console.log(res.data.user);
                     dispatch(setUserProfile(res.data.user));
                 }
             } catch (error) {

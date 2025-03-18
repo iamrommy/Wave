@@ -59,7 +59,7 @@ const CommentDialog = ({ open, setOpen }) => {
 
   return (
     <Dialog open={open}>
-      <DialogContent onInteractOutside={() => setOpen(false)} className="max-w-5xl p-0 flex flex-col">
+      <DialogContent onInteractOutside={() => setOpen(false)} className="max-w-5xl p-0 flex flex-col" aria-describedby={undefined}>
         <div className='flex flex-1 text-gray-200'>
           <div className='w-1/2'>
             <img
@@ -71,10 +71,10 @@ const CommentDialog = ({ open, setOpen }) => {
           <div className='w-1/2 flex flex-col justify-between'>
             <div className='flex items-center justify-between p-4'>
               <div className='flex gap-3 items-center'>
-                <Link>
+                <Link to={`/profile/${selectedPost?.author?._id}`}>
                   <Avatar>
                     <AvatarImage src={selectedPost?.author?.profilePicture} />
-                    <AvatarFallback>CN</AvatarFallback>
+                    <AvatarFallback>{selectedPost?.author?.username[0]}</AvatarFallback>
                   </Avatar>
                 </Link>
                 <div>

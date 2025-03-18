@@ -12,6 +12,7 @@ import { toast } from 'sonner'
 import { setPosts, setSelectedPost } from '@/redux/postSlice'
 import { Badge } from './ui/badge'
 import { setAuthUser } from '../redux/authSlice';
+import { Link } from 'react-router-dom';
 
 const Post = ({ post }) => {
     const [text, setText] = useState("");
@@ -114,10 +115,12 @@ const Post = ({ post }) => {
         <div className='my-8 w-full max-w-sm mx-auto'>
             <div className='flex items-center justify-between'>
                 <div className='flex items-center gap-2'>
-                    <Avatar>
-                        <AvatarImage src={post.author?.profilePicture} alt="post_image" />
-                        <AvatarFallback>CN</AvatarFallback>
-                    </Avatar>
+                    <Link to={`/profile/${post?.author?._id}`}>
+                        <Avatar>
+                            <AvatarImage src={post.author?.profilePicture} alt="post_image" />
+                            <AvatarFallback className="text-white">{post.author?.username[0]}</AvatarFallback>
+                        </Avatar>
+                    </Link>
                     <div className='flex items-center gap-3'>
                         <h1>{post.author?.username}</h1>
                        {user?._id === post.author._id &&  <Badge variant="secondary">Author</Badge>}

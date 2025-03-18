@@ -11,7 +11,7 @@ import { setMessages } from '@/redux/chatSlice';
 
 const ChatPage = () => {
     const [textMessage, setTextMessage] = useState("");
-    const { user, suggestedUsers, selectedUser } = useSelector(store => store.auth);
+    const { user, selectedUser } = useSelector(store => store.auth);
     const { onlineUsers, messages } = useSelector(store => store.chat);
     const dispatch = useDispatch();
 
@@ -45,20 +45,20 @@ const ChatPage = () => {
                 <hr className='mb-4 border-gray-300' />
                 <div className='overflow-y-auto h-[80vh]'>
                     {
-                        suggestedUsers.map((suggestedUser) => {
-                            const isOnline = onlineUsers.includes(suggestedUser?._id);
+                        user?.following.map((following) => {
+                            const isOnline = onlineUsers.includes(following?._id);
                             return (
                                 <div 
-                                    key={suggestedUser?._id}  // ✅ Added unique key prop here
-                                    onClick={() => dispatch(setSelectedUser(suggestedUser))} 
+                                    key={following?._id}  // ✅ Added unique key prop here
+                                    onClick={() => dispatch(setSelectedUser(following))} 
                                     className='flex gap-3 items-center p-3 hover:bg-gray-50 cursor-pointer'
                                 >
                                     <Avatar className='w-14 h-14'>
-                                        <AvatarImage src={suggestedUser?.profilePicture} />
+                                        <AvatarImage src={following?.profilePicture} />
                                         <AvatarFallback>CN</AvatarFallback>
                                     </Avatar>
                                     <div className='flex flex-col'>
-                                        <span className='font-medium'>{suggestedUser?.username}</span>
+                                        <span className='font-medium'>{following?.username}</span>
                                         <span className={`text-xs font-bold ${isOnline ? 'text-green-600' : 'text-red-600'} `}>
                                             {isOnline ? 'online' : 'offline'}
                                         </span>

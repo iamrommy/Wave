@@ -249,6 +249,12 @@ exports.deletePost = async (req, res) => {
         user.posts = user.posts.filter(id => id.toString() !== postId);
         await user.save();
 
+        // Remove post from all users' bookmarks
+        await User.updateMany(
+            { bookmarks: postId },
+            { $pull: { bookmarks: postId } }
+        );
+
         // Delete associated comments
         await Comment.deleteMany({ post: postId });
 

@@ -10,6 +10,7 @@ import CreatePost from './CreatePost'
 import { setPosts, setSelectedPost } from '@/redux/postSlice'
 import { Popover, PopoverContent, PopoverTrigger } from './ui/popover'
 import { Button } from './ui/button'
+import { setSuggestedUsers } from '../redux/authSlice'
 
 const LeftSidebar = () => {
     const navigate = useNavigate();
@@ -26,6 +27,7 @@ const LeftSidebar = () => {
                 dispatch(setAuthUser(null));
                 dispatch(setSelectedPost(null));
                 dispatch(setPosts([]));
+                dispatch(setSuggestedUsers([]))
                 navigate("/login");
                 toast.success(res.data.message);
             }
