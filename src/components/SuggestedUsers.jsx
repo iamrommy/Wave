@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
+import Profilepic from './ui/profilepic'
+// import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { setAuthUser, setSuggestedUsers } from '../redux/authSlice';
 import axios from 'axios';
 import { toast } from 'sonner';
@@ -61,10 +62,11 @@ const SuggestedUsers = () => {
                 <div key={suggested._id} className='flex items-center justify-between my-5'>
                     <div className='flex items-center gap-2'>
                         <Link to={`/profile/${suggested?._id}`}>
-                            <Avatar>
+                            {/* <Avatar>
                                 <AvatarImage src={suggested?.profilePicture} alt="post_image" />
                                 <AvatarFallback className="text-white">{suggested?.username[0]}</AvatarFallback>
-                            </Avatar>
+                            </Avatar> */}
+                            <Profilepic url={suggested?.profilePicture}/>
                         </Link>
                         <div>
                             <h1 className='font-semibold text-sm'>

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Dialog, DialogContent, DialogTrigger } from './ui/dialog'
-import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar'
+// import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar'
 import { Link } from 'react-router-dom'
 import { MoreHorizontal } from 'lucide-react'
 import { Button } from './ui/button'
@@ -9,6 +9,7 @@ import Comment from './Comment'
 import axios from 'axios'
 import { toast } from 'sonner'
 import { setPosts } from '@/redux/postSlice'
+import Profilepic from './ui/profilepic'
 
 const CommentDialog = ({ open, setOpen }) => {
   const [text, setText] = useState("");
@@ -72,10 +73,11 @@ const CommentDialog = ({ open, setOpen }) => {
             <div className='flex items-center justify-between p-4'>
               <div className='flex gap-3 items-center'>
                 <Link to={`/profile/${selectedPost?.author?._id}`}>
-                  <Avatar>
+                  {/* <Avatar>
                     <AvatarImage src={selectedPost?.author?.profilePicture} />
                     <AvatarFallback>{selectedPost?.author?.username[0]}</AvatarFallback>
-                  </Avatar>
+                  </Avatar> */}
+                  <Profilepic url={selectedPost?.author?.profilePicture}/>
                 </Link>
                 <div>
                   <Link className='font-semibold text-xs'>{selectedPost?.author?.username}</Link>

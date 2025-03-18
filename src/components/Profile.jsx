@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
+// import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import useGetUserProfile from '@/hooks/useGetUserProfile';
 import { Link, useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
@@ -8,6 +8,7 @@ import axios from 'axios';
 import { toast } from 'sonner';
 import { setAuthUser, setUserProfile } from '../redux/authSlice';
 import { Dialog, DialogContent, DialogHeader } from './ui/dialog';
+import Profilepic from './ui/profilepic';
 
 const Profile = () => {
   const params = useParams();
@@ -24,10 +25,16 @@ const Profile = () => {
   
   const isLoggedInUserProfile = user?._id === userProfile?._id;
   
+  useEffect(()=>{
+    return ()=>{
+      dispatch(setUserProfile(null));
+    }
+  },[]);
+  
   const handleTabChange = (tab) => {
     setActiveTab(tab);
   };
-  
+
   const handleDialogOpen = (type) => {
     setDialogData(type === 'followers' ? userProfile.followers : userProfile.following);
     setOpenDialog(true);
@@ -89,72 +96,82 @@ const Profile = () => {
 
   return (
     <div className='flex max-w-5xl justify-center mx-auto pl-10'>
-      <div className='flex flex-col gap-20 p-8'>
-        <div className='grid grid-cols-2'>
-          <section className='flex items-center justify-center'>
-            <Avatar className='h-32 w-32'>
-              {userProfile?.profilePicture ? (
-              <AvatarImage src={userProfile.profilePicture} alt="profilephoto" />
-            ) : null}
-              <AvatarFallback className="text-white">{userProfile.username[0]}</AvatarFallback>
-            </Avatar>
-          </section>
-          <section>
-            <div className='flex flex-col gap-5'>
-              <div className='flex items-center gap-2'>
-                <span>{userProfile?.username}</span>
-                {
-                  isLoggedInUserProfile ? (
-                    <Link to="/account/edit"><Button variant='secondary' className='hover:bg-gray-200 h-8'>Edit profile</Button></Link>
-                  ) : (
-                    userProfile?.followers?.some(follower => follower._id === user._id) ? (
-                      <Button variant='destructive' className='h-8' onClick={() => followOrUnfollow(userId, "userProfile")}>
-                        {loading ? (<span className="loader"></span>) : "Unfollow"}
-                      </Button>
+      
+      {
+        userProfile ? (
+        <div className='flex flex-col gap-20 p-8'>
+          <div className='grid grid-cols-2'>
+            <section className='flex items-center justify-center'>
+              {/* <Avatar className='h-32 w-32'>
+                {userProfile?.profilePicture ? (
+                <AvatarImage src={userProfile.profilePicture} alt="profilephoto" />
+                 ) : null}
+                <AvatarFallback className="text-white">{userProfile.username[0]}</AvatarFallback>
+              </Avatar> */}
+              <Profilepic url={userProfile?.profilePicture} classes={'h-32 w-32'}/>
+            </section>
+            <section>
+              <div className='flex flex-col gap-5'>
+                <div className='flex items-center gap-2'>
+                  <span>{userProfile?.username}</span>
+                  {
+                    isLoggedInUserProfile ? (
+                      <Link to="/account/edit"><Button variant='secondary' className='hover:bg-gray-200 h-8'>Edit profile</Button></Link>
                     ) : (
-                      <Button variant='secondary' className='bg-[#0095F6] hover:bg-[#3192d2] h-8' onClick={() => followOrUnfollow(userId, "userProfile")}>
-                        {loading ? (<span className="loader"></span>) : "Follow"}
-                      </Button>
+                      userProfile?.followers?.some(follower => follower._id === user._id) ? (
+                        <Button variant='destructive' className='h-8' onClick={() => followOrUnfollow(userId, "userProfile")}>
+                          {loading ? (<span className="loader"></span>) : "Unfollow"}
+                        </Button>
+                      ) : (
+                        <Button variant='secondary' className='bg-[#0095F6] hover:bg-[#3192d2] h-8' onClick={() => followOrUnfollow(userId, "userProfile")}>
+                          {loading ? (<span className="loader"></span>) : "Follow"}
+                        </Button>
+                      )
                     )
-                  )
-                }
-              </div>
-              <div className='flex items-center gap-4'>
-                <p><span className='font-semibold'>{userProfile?.posts?.length} </span>posts</p>
-                <p className='cursor-pointer' onClick={() => handleDialogOpen('followers')}>
-                  <span className='font-semibold'>{userProfile?.followers?.length} </span>followers
-                </p>
-                <p className='cursor-pointer' onClick={() => handleDialogOpen('following')}>
-                  <span className='font-semibold'>{userProfile?.following?.length} </span>following
-                </p>
-              </div>
-              <div className='flex flex-col gap-1'>
-                <span className='font-semibold'>{userProfile?.bio || 'bio here...'}</span>
-              </div>
-            </div>
-          </section>
-        </div>
-
-        <div className='border-t border-t-gray-200'>
-          <div className='flex items-center justify-center gap-10 text-sm'>
-            <span className={`py-3 cursor-pointer ${activeTab === 'posts' ? 'font-bold' : ''}`} onClick={() => handleTabChange('posts')}>
-              POSTS
-            </span>
-            <span className={`py-3 cursor-pointer ${activeTab === 'saved' ? 'font-bold' : ''}`} onClick={() => handleTabChange('saved')}>
-              SAVED
-            </span>
-          </div>
-          <div className='grid grid-cols-3 gap-1'>
-            {
-              displayedPost?.map((post) => (
-                <div key={post?._id} className='relative group cursor-pointer'>
-                  <img src={post.image} alt='postimage' className='rounded-sm my-2 w-full aspect-square object-cover' />
+                  }
                 </div>
-              ))
-            }
+                <div className='flex items-center gap-4'>
+                  <p><span className='font-semibold'>{userProfile?.posts?.length} </span>posts</p>
+                  <p className='cursor-pointer' onClick={() => handleDialogOpen('followers')}>
+                    <span className='font-semibold'>{userProfile?.followers?.length} </span>followers
+                  </p>
+                  <p className='cursor-pointer' onClick={() => handleDialogOpen('following')}>
+                    <span className='font-semibold'>{userProfile?.following?.length} </span>following
+                  </p>
+                </div>
+                <div className='flex flex-col gap-1'>
+                  <span className='font-semibold'>{userProfile?.bio || 'bio here...'}</span>
+                </div>
+              </div>
+            </section>
+          </div>
+
+          <div className='border-t border-t-gray-200'>
+            <div className='flex items-center justify-center gap-10 text-sm'>
+              <span className={`py-3 cursor-pointer ${activeTab === 'posts' ? 'font-bold' : ''}`} onClick={() => handleTabChange('posts')}>
+                POSTS
+              </span>
+              <span className={`py-3 cursor-pointer ${activeTab === 'saved' ? 'font-bold' : ''}`} onClick={() => handleTabChange('saved')}>
+                SAVED
+              </span>
+            </div>
+            <div className='grid grid-cols-3 gap-1'>
+              {
+                displayedPost?.map((post) => (
+                  <div key={post?._id} className='relative group cursor-pointer'>
+                    <img src={post.image} alt='postimage' className='rounded-sm my-2 w-full aspect-square object-cover' />
+                  </div>
+                ))
+              }
+            </div>
           </div>
         </div>
-      </div>
+        ) : (
+          <div className='h-screen w-screen flex items-center justify-center'>
+            <span className='loader3'></span>
+          </div>
+        )
+      }
 
       {/* Followers/Following Dialog */}
       <Dialog open={openDialog}>
@@ -175,10 +192,11 @@ const Profile = () => {
                 return (
                   <div key={dialogUser._id} className="flex items-center gap-3 justify-between">
                     <Link className="flex items-center gap-3" to={`/profile/${dialogUser?._id}`} onClick={() => setOpenDialog(false)}>
-                      <Avatar className="h-10 w-10">
+                      {/* <Avatar className="h-10 w-10">
                         <AvatarImage src={dialogUser.profilePicture} alt="profile" />
                         <AvatarFallback className="text-white">{dialogUser.username[0]}</AvatarFallback>
-                      </Avatar>
+                      </Avatar> */}
+                      <Profilepic url={dialogUser?.profilePicture} classes={'h-10 w-10'}/>
                       <span className="text-white">{dialogUser.username}</span>
                     </Link>
                     {dialogUser._id !== user._id && (

@@ -1,9 +1,10 @@
 import React, { useState } from 'react'
-import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar'
+// import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar'
 import { Dialog, DialogContent, DialogTrigger } from './ui/dialog'
 import { Bookmark, MessageCircle, MoreHorizontal, Send } from 'lucide-react'
 import { FaBookmark, FaRegBookmark  } from "react-icons/fa";
 import { Button } from './ui/button'
+import Profilepic from './ui/profilepic';
 import { FaHeart, FaRegHeart } from "react-icons/fa";
 import CommentDialog from './CommentDialog'
 import { useDispatch, useSelector } from 'react-redux'
@@ -116,10 +117,11 @@ const Post = ({ post }) => {
             <div className='flex items-center justify-between'>
                 <div className='flex items-center gap-2'>
                     <Link to={`/profile/${post?.author?._id}`}>
-                        <Avatar>
+                        {/* <Avatar>
                             <AvatarImage src={post.author?.profilePicture} alt="post_image" />
                             <AvatarFallback className="text-white">{post.author?.username[0]}</AvatarFallback>
-                        </Avatar>
+                        </Avatar> */}
+                        <Profilepic url={post?.author?.profilePicture}/>
                     </Link>
                     <div className='flex items-center gap-3'>
                         <h1>{post.author?.username}</h1>

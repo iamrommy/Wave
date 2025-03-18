@@ -1,6 +1,7 @@
 import React, { useRef, useState } from 'react'
 import { Dialog, DialogContent, DialogHeader, DialogDescription } from './ui/dialog'
-import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
+import Profilepic from './ui/profilepic'
+// import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { Textarea } from './ui/textarea';
 import { Button } from './ui/button';
 import { readFileAsDataURL } from '@/lib/utils';
@@ -59,10 +60,11 @@ const CreatePost = ({ open, setOpen }) => {
         <DialogHeader className='text-center font-semibold text-white'>Create New Post</DialogHeader>
         <DialogDescription className='sr-only'>Create a new post by adding a caption and an image.</DialogDescription>
         <div className='flex gap-3 items-center'>
-          <Avatar>
+          {/* <Avatar>
             <AvatarImage src={user?.profilePicture} alt="img" />
             <AvatarFallback>CN</AvatarFallback>
-          </Avatar>
+          </Avatar> */}
+          <Profilepic url={user?.profilePicture} />
           <div className='text-gray-200'>
             <h1 className='font-semibold text-xs'>{user?.username}</h1>
             <span className='text-gray-600 text-xs'>Bio here...</span>

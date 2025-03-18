@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
+// import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { Button } from './ui/button';
 import { Textarea } from './ui/textarea';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from './ui/select';
@@ -9,6 +9,7 @@ import { Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { setAuthUser } from '@/redux/authSlice';
+import Profilepic from './ui/profilepic';
 
 const EditProfile = () => {
     const imageRef = useRef();
@@ -73,10 +74,11 @@ const EditProfile = () => {
                 <h1 className='font-bold text-xl'>Edit Profile</h1>
                 <div className='flex items-center justify-between bg-gray-100 rounded-xl p-4'>
                     <div className='flex items-center gap-3'>
-                        <Avatar>
+                        {/* <Avatar>
                             <AvatarImage src={user?.profilePicture} alt="post_image" />
                             <AvatarFallback>CN</AvatarFallback>
-                        </Avatar>
+                        </Avatar> */}
+                        <Profilepic url={user?.profilePicture} />
                         <div>
                             <h1 className='font-bold text-sm'>{user?.username}</h1>
                             <span className='text-gray-600'>{user?.bio || 'Bio here...'}</span>

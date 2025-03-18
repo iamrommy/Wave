@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
+// import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { setSelectedUser } from '@/redux/authSlice';
 import { Input } from './ui/input';
 import { Button } from './ui/button';
@@ -8,6 +8,7 @@ import { MessageCircleCode } from 'lucide-react';
 import Messages from './Messages';
 import axios from 'axios';
 import { setMessages } from '@/redux/chatSlice';
+import Profilepic from './ui/profilepic';
 
 const ChatPage = () => {
     const [textMessage, setTextMessage] = useState("");
@@ -53,10 +54,11 @@ const ChatPage = () => {
                                     onClick={() => dispatch(setSelectedUser(following))} 
                                     className='flex gap-3 items-center p-3 hover:bg-gray-50 cursor-pointer'
                                 >
-                                    <Avatar className='w-14 h-14'>
+                                    {/* <Avatar className='w-14 h-14'>
                                         <AvatarImage src={following?.profilePicture} />
                                         <AvatarFallback>CN</AvatarFallback>
-                                    </Avatar>
+                                    </Avatar> */}
+                                    <Profilepic url={following?.profilePicture} classes={'w-14 h-14'}/>
                                     <div className='flex flex-col'>
                                         <span className='font-medium'>{following?.username}</span>
                                         <span className={`text-xs font-bold ${isOnline ? 'text-green-600' : 'text-red-600'} `}>
@@ -75,10 +77,11 @@ const ChatPage = () => {
                 selectedUser ? (
                     <section className='flex-1 border-l border-l-gray-300 flex flex-col h-full'>
                         <div className='flex gap-3 items-center px-3 py-2 border-b border-gray-300 sticky top-0 bg-white z-10'>
-                            <Avatar>
+                            {/* <Avatar>
                                 <AvatarImage src={selectedUser?.profilePicture} alt='profile' />
                                 <AvatarFallback>CN</AvatarFallback>
-                            </Avatar>
+                            </Avatar> */}
+                            <Profilepic url={selectedUser?.profilePicture}/>
                             <div className='flex flex-col'>
                                 <span>{selectedUser?.username}</span>
                             </div>
