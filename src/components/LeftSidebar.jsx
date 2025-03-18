@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react'
 // import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar'
 import { toast } from 'sonner'
 import axios from 'axios'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { setAuthUser } from '@/redux/authSlice'
 import CreatePost from './CreatePost'
@@ -110,12 +110,12 @@ const LeftSidebar = () => {
                                                     ) : (
                                                         likeNotification.map((notification) => {
                                                             return (
-                                                                <div key={notification.userId} className='flex items-center gap-2 my-2'>
+                                                                <Link key={notification.userId} className='flex items-center gap-2 my-2' to={`/profile/${notification?.userDetails?._id}`}>
                                                                     <Profilepic url={notification.userDetails?.profilePicture} />
                                                                     <p className='text-sm'>
                                                                         <span className='font-bold'>{notification.userDetails?.username}</span> liked your post
                                                                     </p>
-                                                                </div>
+                                                                </Link>
                                                             )
                                                         })
                                                     )
