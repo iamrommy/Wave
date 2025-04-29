@@ -14,6 +14,7 @@ backend/.env
 dist
 dist-ssr
 *.local
+backend/seed.js
 
 # Editor directories and files
 .vscode/*
