@@ -13,6 +13,8 @@ import { Popover, PopoverContent, PopoverTrigger } from './ui/popover'
 import { Button } from './ui/button'
 import { setSuggestedUsers, setUserProfile } from '../redux/authSlice'
 import Profilepic from './ui/profilepic'
+import { setMessages, setOnlineUsers } from '../redux/chatSlice'
+import { setLikeNotification } from '../redux/rtnSlice'
 
 const LeftSidebar = () => {
     const navigate = useNavigate();
@@ -36,6 +38,9 @@ const LeftSidebar = () => {
                 dispatch(setSelectedPost(null));
                 dispatch(setPosts([]));
                 dispatch(setSuggestedUsers([]))
+                dispatch(setOnlineUsers([]));
+                dispatch(setMessages([]));
+                dispatch(setLikeNotification('logout'));
                 dispatch(setUserProfile(null));
                 navigate("/login");
                 toast.success(res.data.message);
