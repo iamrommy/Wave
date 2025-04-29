@@ -40,7 +40,7 @@ const LeftSidebar = () => {
                 dispatch(setSuggestedUsers([]))
                 dispatch(setOnlineUsers([]));
                 dispatch(setMessages([]));
-                dispatch(setLikeNotification('logout'));
+                dispatch(setLikeNotification([]));
                 dispatch(setUserProfile(null));
                 navigate("/login");
                 toast.success(res.data.message);
