@@ -61,26 +61,66 @@ exports.addNewPost = async (req, res) => {
     }
 };
 
+// exports.getAllPost = async (req, res) => {
+//     try {
+//         const posts = await Post.find().sort({ createdAt: -1 })
+//             .populate({ path: 'author', select: 'username profilePicture' })
+//             .populate({
+//                 path: 'comments',
+//                 sort: { createdAt: -1 },
+//                 populate: {
+//                     path: 'author',
+//                     select: 'username profilePicture'
+//                 }
+//             });
+//         return res.status(200).json({
+//             posts,
+//             success: true
+//         });
+//     } catch (error) {
+//         console.log(error);
+//     }
+// };
+
 exports.getAllPost = async (req, res) => {
     try {
-        const posts = await Post.find().sort({ createdAt: -1 })
-            .populate({ path: 'author', select: 'username profilePicture' })
-            .populate({
+        const loggedInUser = await User.findById(req.id).select("following");
+
+        if (!loggedInUser) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        // Get 50 random posts from all posts
+        const posts = await Post.aggregate([
+            { $sample: { size: 50 } }
+        ]);
+
+        // Populate author and comments like before
+        const populatedPosts = await Post.populate(posts, [
+            {
+                path: 'author',
+                select: 'username profilePicture'
+            },
+            {
                 path: 'comments',
-                sort: { createdAt: -1 },
+                options: { sort: { createdAt: -1 } },
                 populate: {
                     path: 'author',
                     select: 'username profilePicture'
                 }
-            });
+            }
+        ]);
+
         return res.status(200).json({
-            posts,
+            posts: populatedPosts,
             success: true
         });
     } catch (error) {
         console.log(error);
+        res.status(500).json({ message: "Internal Server Error" });
     }
 };
+
 
 exports.getUserPost = async (req, res) => {
     try {

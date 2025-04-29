@@ -66,7 +66,7 @@ const login = async (req, res) => {
             });
         }
 
-        const token = await jwt.sign({ userId: user._id }, process.env.SECRET_KEY, { expiresIn: '1d' });
+        const token = await jwt.sign({ userId: user._id }, process.env.SECRET_KEY, { });
 
         const populatedPosts = await Promise.all(
             user.posts.map(async (postId) => {
@@ -201,24 +201,87 @@ const editProfile = async (req, res) => {
     }
 };
 
+// const getSuggestedUsers = async (req, res) => {
+//     try {
+//         // Fetch the logged-in user to get the list of users they've followed
+//         const loggedInUser = await User.findById(req.id).select("following");
+
+//         if (!loggedInUser) {
+//             return res.status(404).json({ message: "User not found" });
+//         }
+
+//         // Exclude logged-in user and already followed users
+//         const suggestedUsers = await User.find({
+//             _id: { $ne: req.id, $nin: loggedInUser.following }
+//         }).select("-password");
+
+//         if (suggestedUsers.length === 0) {
+//             return res.status(400).json({
+//                 message: 'No suggested users available',
+//             });
+//         }
+
+//         return res.status(200).json({
+//             success: true,
+//             users: suggestedUsers
+//         });
+
+//     } catch (error) {
+//         console.log(error);
+//         res.status(500).json({ message: "Internal Server Error" });
+//     }
+// };
+
+
 const getSuggestedUsers = async (req, res) => {
     try {
-        // Fetch the logged-in user to get the list of users they've followed
         const loggedInUser = await User.findById(req.id).select("following");
 
         if (!loggedInUser) {
             return res.status(404).json({ message: "User not found" });
         }
 
-        // Exclude logged-in user and already followed users
-        const suggestedUsers = await User.find({
-            _id: { $ne: req.id, $nin: loggedInUser.following }
-        }).select("-password");
+        const following = loggedInUser.following;
 
-        if (suggestedUsers.length === 0) {
-            return res.status(400).json({
-                message: 'No suggested users available',
+        let suggestedUsers;
+
+        if (following.length === 0) {
+            // New user: suggest 10 random users excluding self
+            suggestedUsers = await User.aggregate([
+                { $match: { _id: { $ne: loggedInUser._id } } },
+                { $sample: { size: 10 } },
+                { $project: { password: 0 } }
+            ]);
+        } else {
+            // Fetch followings of followings
+            const followingsOfFollowings = await User.find({
+                _id: { $in: following }
+            }).select("following");
+
+            const suggestionsSet = new Set();
+
+            followingsOfFollowings.forEach(user => {
+                user.following.forEach(id => {
+                    // Avoid adding self or already-followed users
+                    if (
+                        id.toString() !== loggedInUser._id.toString() &&
+                        !following.includes(id.toString())
+                    ) {
+                        suggestionsSet.add(id.toString());
+                    }
+                });
             });
+
+            // Convert to array and get only 10 random suggestions
+            const suggestionsArray = Array.from(suggestionsSet);
+
+            // Shuffle and limit to 10
+            const shuffled = suggestionsArray.sort(() => 0.5 - Math.random());
+            const finalSuggestions = shuffled.slice(0, 10);
+
+            suggestedUsers = await User.find({
+                _id: { $in: finalSuggestions }
+            }).select("-password");
         }
 
         return res.status(200).json({
@@ -231,6 +294,7 @@ const getSuggestedUsers = async (req, res) => {
         res.status(500).json({ message: "Internal Server Error" });
     }
 };
+
 
 const followOrUnfollow = async (req, res) => {
     try {
@@ -289,6 +353,32 @@ const followOrUnfollow = async (req, res) => {
     }
 };
 
+const searchUser = async (req, res) => {
+    try {
+      const { searchTerm } = req.query;
+  
+      if (!searchTerm) {
+        return res.status(400).json({ success: false, message: "Search term is required" });
+      }
+  
+      // Perform case-insensitive search using regex
+      const users = await User.find({
+        username: { $regex: searchTerm, $options: "i" }
+      }).select("username profilePicture");
+  
+      // Sort results based on position of searchTerm in username
+      const sortedUsers = users.sort((a, b) => {
+        const aIndex = a.username.toLowerCase().indexOf(searchTerm.toLowerCase());
+        const bIndex = b.username.toLowerCase().indexOf(searchTerm.toLowerCase());
+        return aIndex - bIndex;
+      });
+  
+      res.status(200).json({ success: true, users: sortedUsers });
+    } catch (error) {
+      console.error("Error searching user:", error);
+      res.status(500).json({ success: false, message: "Server error" });
+    }
+  };  
+  
 
-
-module.exports = { register, login, logout, getProfile, editProfile, getSuggestedUsers, followOrUnfollow };
+module.exports = { register, login, logout, getProfile, editProfile, getSuggestedUsers, followOrUnfollow, searchUser };

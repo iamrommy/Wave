@@ -1,5 +1,6 @@
 import { Heart, Home, LogOut, MessageCircle, PlusSquare, Search, TrendingUp } from 'lucide-react'
 import React, { useState, useEffect } from 'react'
+import SearchUser from './SearchUser'
 // import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar'
 import { toast } from 'sonner'
 import axios from 'axios'
@@ -19,6 +20,7 @@ const LeftSidebar = () => {
     const { user } = useSelector(store => store.auth);
     const { likeNotification } = useSelector(store => store.realTimeNotification);
     const [open, setOpen] = useState(false);
+    const [openSearch, setOpenSearch] = useState(false);
     const [unreadNotifications, setUnreadNotifications] = useState(likeNotification.length);
 
     // Reset unread notifications count whenever new notifications arrive
@@ -54,6 +56,8 @@ const LeftSidebar = () => {
             navigate("/");
         } else if (textType === 'Messages') {
             navigate("/chat");
+        } else if (textType === 'Search') {
+            setOpenSearch(true);
         }
     }
 
@@ -136,6 +140,7 @@ const LeftSidebar = () => {
             </div>
 
             <CreatePost open={open} setOpen={setOpen} />
+            <SearchUser openSearch={openSearch} setOpenSearch={setOpenSearch} />
         </div>
     )
 }

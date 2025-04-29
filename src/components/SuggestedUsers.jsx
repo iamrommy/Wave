@@ -60,7 +60,7 @@ const SuggestedUsers = () => {
             </div>
             {suggestedUsers?.map((suggested) => (
                 <div key={suggested._id} className='flex items-center justify-between my-5'>
-                    <div className='flex items-center gap-2'>
+                    <div className='flex items-center gap-2 mr-3'>
                         <Link to={`/profile/${suggested?._id}`}>
                             {/* <Avatar>
                                 <AvatarImage src={suggested?.profilePicture} alt="post_image" />

@@ -162,7 +162,7 @@ const Post = ({ post }) => {
                     }} className='cursor-pointer hover:text-gray-600' />
                 </div>
                 {
-                    user.bookmarks?.includes(post._id) ?
+                    user?.bookmarks?.includes(post._id) ?
                     (<FaBookmark  onClick={bookmarkHandler} className='cursor-pointer hover:text-gray-600' /> )
                     : (<FaRegBookmark  onClick={bookmarkHandler} className='cursor-pointer hover:text-gray-600' /> )
                 }
