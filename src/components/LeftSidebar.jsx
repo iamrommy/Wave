@@ -15,6 +15,7 @@ import { setSuggestedUsers, setUserProfile } from '../redux/authSlice'
 import Profilepic from './ui/profilepic'
 import { setMessages, setOnlineUsers } from '../redux/chatSlice'
 import { setLikeNotification } from '../redux/rtnSlice'
+import { setFeedPosts } from '../redux/postSlice'
 
 const LeftSidebar = () => {
     const navigate = useNavigate();
@@ -42,6 +43,7 @@ const LeftSidebar = () => {
                 dispatch(setMessages([]));
                 dispatch(setLikeNotification([]));
                 dispatch(setUserProfile(null));
+                dispatch(setFeedPosts([]));
                 navigate("/login");
                 toast.success(res.data.message);
             }

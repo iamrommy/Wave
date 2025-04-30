@@ -145,6 +145,43 @@ exports.getUserPost = async (req, res) => {
     }
 };
 
+exports.getFeedPost = async (req, res) => {
+    try {
+        const authorId = req.id;
+
+        // 1. Get the list of users the current user is following
+        const user = await User.findById(authorId).select('following');
+
+        if (!user) {
+            return res.status(404).json({ success: false, message: "User not found" });
+        }
+
+        // 2. Find posts from followed users
+        const posts = await Post.find({ author: { $in: user.following } }).limit(50)
+            .sort({ createdAt: -1 })
+            .populate({
+                path: 'author',
+                select: 'username profilePicture'
+            })
+            .populate({
+                path: 'comments',
+                options: { sort: { createdAt: -1 } },
+                populate: {
+                    path: 'author',
+                    select: 'username profilePicture'
+                }
+            });
+
+        return res.status(200).json({
+            posts,
+            success: true
+        });
+    } catch (error) {
+        console.error("Error fetching feed posts:", error);
+        return res.status(500).json({ success: false, message: "Server error" });
+    }
+};
+
 exports.likePost = async (req, res) => {
     try {
         const likeKrneWalaUserKiId = req.id;

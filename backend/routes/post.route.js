@@ -10,7 +10,8 @@ const {
     getAllPost, 
     getCommentsOfPost, 
     getUserPost, 
-    likePost 
+    likePost,
+    getFeedPost
 } = require("../controllers/post.controller.js");
 
 const router = express.Router();
@@ -24,5 +25,6 @@ router.route("/:id/comment").post(isAuthenticated, addComment);
 router.route("/:id/comment/all").get(isAuthenticated, getCommentsOfPost);
 router.route("/delete/:id").delete(isAuthenticated, deletePost);
 router.route("/:id/bookmark").get(isAuthenticated, bookmarkPost);
+router.route("/feed").get(isAuthenticated, getFeedPost);
 
 module.exports = router;
