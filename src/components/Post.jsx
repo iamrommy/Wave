@@ -10,17 +10,20 @@ import CommentDialog from './CommentDialog'
 import { useDispatch, useSelector } from 'react-redux'
 import axios from 'axios'
 import { toast } from 'sonner'
+import { setActiveTab, setOpenPost } from '../redux/miscelaneousSlice';
 import { setPosts, setSelectedPost } from '@/redux/postSlice'
 import { Badge } from './ui/badge'
-import { setAuthUser } from '../redux/authSlice';
+import { setAuthUser, setUserProfile } from '../redux/authSlice';
 import { Link } from 'react-router-dom';
+import { setFeedPosts } from '../redux/postSlice';
 
-const Post = ({ post }) => {
+const Post = ({ post, whichPost}) => {
+    // console.log(post);
     const [text, setText] = useState("");
     const [open, setOpen] = useState(false);
-    const { user } = useSelector(store => store.auth);
+    const { user, userProfile} = useSelector(store => store.auth);
     // console.log(user);
-    const { posts } = useSelector(store => store.post);
+    const { posts, feedPosts } = useSelector(store => store.post);
     const [liked, setLiked] = useState(post.likes.includes(user?._id) || false);
     const [postLike, setPostLike] = useState(post.likes.length);
     const dispatch = useDispatch();
@@ -44,15 +47,48 @@ const Post = ({ post }) => {
                 setPostLike(updatedLikes);
                 setLiked(!liked);
 
-                // apne post ko update krunga
-                const updatedPostData = posts.map(p =>
-                    p._id === post._id ? {
-                        ...p,
-                        likes: liked ? p.likes.filter(id => id !== user._id) : [...p.likes, user._id]
-                    } : p
-                );
-                dispatch(setPosts(updatedPostData));
-                toast.success(res.data.message);
+                if(whichPost === "profilePost"){
+                    const updatedUserProfilePostData = userProfile.posts.map(p =>
+                        p._id === post._id ? {
+                            ...p,
+                            likes: liked ? p.likes.filter(id => id !== user._id) : [...p.likes, user._id]
+                        } : p
+                    );
+                    const updatedUserProfileData = {...userProfile, posts : updatedUserProfilePostData}
+                    dispatch(setUserProfile(updatedUserProfileData));
+                    toast.success(res.data.message);
+                }
+                else if(whichPost === "feedPosts"){
+                    const updatedPostData = feedPosts.map(p =>
+                        p._id === post._id ? {
+                            ...p,
+                            likes: liked ? p.likes.filter(id => id !== user._id) : [...p.likes, user._id]
+                        } : p
+                    );
+                    dispatch(setFeedPosts(updatedPostData));
+                    toast.success(res.data.message);
+                }
+                else if(whichPost === "recommendedPosts"){
+                    const updatedPostData = posts.map(p =>
+                        p._id === post._id ? {
+                            ...p,
+                            likes: liked ? p.likes.filter(id => id !== user._id) : [...p.likes, user._id]
+                        } : p
+                    );
+                    dispatch(setPosts(updatedPostData));
+                    toast.success(res.data.message);
+                }
+                else if(whichPost === "profileBookmark"){
+                    const updatedBookmarksData = userProfile?.bookmarks.map(p =>
+                        p._id === post._id ? {
+                            ...p,
+                            likes: liked ? p.likes.filter(id => id !== user._id) : [...p.likes, user._id]
+                        } : p
+                    );
+                    const updatedUserProfileData = {...userProfile, bookmarks : updatedBookmarksData}
+                    dispatch(setUserProfile(updatedUserProfileData));
+                    toast.success(res.data.message);
+                }
             }
         } catch (error) {
             console.log(error);
@@ -115,7 +151,7 @@ const Post = ({ post }) => {
     return (
         <div className='my-8 w-full max-w-sm mx-auto'>
             <div className='flex items-center justify-between'>
-                <div className='flex items-center gap-2'>
+                <div className='flex items-center gap-2' onClick={()=>{if(whichPost==="profilePost"||whichPost==="profileBookmark"){dispatch(setActiveTab('posts')); dispatch(setOpenPost(null))}}}>
                     <Link to={`/profile/${post?.author?._id}`}>
                         {/* <Avatar>
                             <AvatarImage src={post.author?.profilePicture} alt="post_image" />

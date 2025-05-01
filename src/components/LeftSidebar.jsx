@@ -11,6 +11,7 @@ import CreatePost from './CreatePost'
 import { setPosts, setSelectedPost } from '@/redux/postSlice'
 import { Popover, PopoverContent, PopoverTrigger } from './ui/popover'
 import { Button } from './ui/button'
+import { setActiveTab, setOpenPost } from '../redux/miscelaneousSlice';
 import { setSuggestedUsers, setUserProfile } from '../redux/authSlice'
 import Profilepic from './ui/profilepic'
 import { setMessages, setOnlineUsers } from '../redux/chatSlice'
@@ -58,6 +59,8 @@ const LeftSidebar = () => {
         } else if (textType === "Create") {
             setOpen(true);
         } else if (textType === "Profile") {
+            dispatch(setActiveTab('posts')); 
+            dispatch(setOpenPost(null));
             navigate(`/profile/${user?._id}`);
         } else if (textType === "Home") {
             navigate("/");

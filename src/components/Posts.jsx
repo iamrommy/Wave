@@ -12,7 +12,7 @@ const Posts = () => {
           <>
             <div className='text-lg font-semibold'>Your Feed</div>
             {feedPosts.map((post) => (
-              <Post key={post._id} post={post} />
+              <Post key={post._id} post={post} whichPost="feedPosts"/>
             ))}
           </>
         ) : (
@@ -23,7 +23,7 @@ const Posts = () => {
           <>
             <div className='text-lg font-semibold'>Recommended Posts</div>
             {posts.map((post) => (
-              <Post key={post._id} post={post} />
+              <Post key={post._id} post={post} whichPost="recommendedPosts"/>
             ))}
           </>
         ) : (

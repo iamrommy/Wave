@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom'
 import Profilepic from './ui/profilepic'
 
 const Comment = ({ comment }) => {
+    // console.log(comment);
     return (
         <div className='my-2'>
             <div className='flex gap-3 items-center'>

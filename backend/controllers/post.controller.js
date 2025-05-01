@@ -103,7 +103,7 @@ exports.getAllPost = async (req, res) => {
             },
             {
                 path: 'comments',
-                options: { sort: { createdAt: -1 } },
+                options: { sort: { createdAt: 1 } },
                 populate: {
                     path: 'author',
                     select: 'username profilePicture'
@@ -130,7 +130,7 @@ exports.getUserPost = async (req, res) => {
             select: 'username profilePicture'
         }).populate({
             path: 'comments',
-            sort: { createdAt: -1 },
+            sort: { createdAt: 1 },
             populate: {
                 path: 'author',
                 select: 'username profilePicture'
@@ -165,7 +165,7 @@ exports.getFeedPost = async (req, res) => {
             })
             .populate({
                 path: 'comments',
-                options: { sort: { createdAt: -1 } },
+                options: { sort: { createdAt: 1 } },
                 populate: {
                     path: 'author',
                     select: 'username profilePicture'

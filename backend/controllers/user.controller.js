@@ -120,17 +120,51 @@ const getProfile = async (req, res) => {
     try {
         const userId = req.params.id;
         let user = await User.findById(userId)
-                        .populate({ path: 'posts', options: { sort: { createdAt: -1 } } })
-                        .populate('bookmarks')
-                        .populate('followers')
-                        .populate('following')
-                        .exec();
+            .populate({
+                path: 'posts',
+                options: { sort: { createdAt: -1 } },
+                populate: [
+                    {
+                        path: 'author',
+                        select: 'username profilePicture _id'
+                    },
+                    {
+                        path: 'comments',
+                        populate: {
+                            path: 'author',
+                            select: 'username profilePicture _id'
+                        }
+                    }
+                ]
+            })
+            .populate({
+                path: 'bookmarks',
+                options: { sort: { createdAt: -1 } },
+                populate: [
+                    {
+                        path: 'author',
+                        select: 'username profilePicture _id'
+                    },
+                    {
+                        path: 'comments',
+                        populate: {
+                            path: 'author',
+                            select: 'username profilePicture _id'
+                        }
+                    }
+                ]
+            })
+            .populate('followers')
+            .populate('following')
+            .exec();
+
         return res.status(200).json({
             user,
             success: true
         });
     } catch (error) {
         console.log(error);
+        return res.status(500).json({ success: false, message: "Server error" });
     }
 };
 
