@@ -6,12 +6,24 @@ import Profilepic from './ui/profilepic'
 import { setAuthUser, setSuggestedUsers } from '../redux/authSlice';
 import axios from 'axios';
 import { toast } from 'sonner';
+import { setFeedPosts } from '../redux/postSlice';
 
 const SuggestedUsers = () => {
     const { suggestedUsers, user } = useSelector(store => store.auth);
     const dispatch = useDispatch();
     // State to track loading for each button
     const [loadingState, setLoadingState] = useState({});
+
+    const fetchFeedPosts = async () => {
+        try {
+            const res = await axios.get(`${import.meta.env.VITE_APP_BASE_URL}/post/feed`, { withCredentials: true });
+            if (res.data.success) {
+                dispatch(setFeedPosts(res.data.posts));
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    };
 
     const followOrUnfollow = async (userId) => {
         try {
@@ -44,6 +56,7 @@ const SuggestedUsers = () => {
                 };
                 dispatch(setAuthUser(updatedUserData));
                 toast.success(res.data.message);
+                fetchFeedPosts();
             }
         } catch (error) {
             toast.error(error.response?.data?.message || "Something went wrong"); 

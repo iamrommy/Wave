@@ -8,7 +8,7 @@ const Posts = () => {
   return (
     <div>
       {user?.following?.length > 0 ? (
-        feedPosts ? (
+        feedPosts?.length > 0 ? (
           <>
             <div className='text-lg font-semibold'>Your Feed</div>
             {feedPosts.map((post) => (
@@ -19,7 +19,7 @@ const Posts = () => {
           <div className='loader3 mt-[40vh]'></div>
         )
       ) : (
-        posts ? (
+        posts?.length > 0 ? (
           <>
             <div className='text-lg font-semibold'>Recommended Posts</div>
             {posts.map((post) => (
