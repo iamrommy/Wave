@@ -5,7 +5,6 @@ import { useSelector } from 'react-redux'
 const Posts = () => {
   const { posts, feedPosts} = useSelector(store => store.post);
   const { user } = useSelector(store => store.auth);
-
   return (
     <div>
       {user?.following?.length > 0 ? (
@@ -17,7 +16,7 @@ const Posts = () => {
             ))}
           </>
         ) : (
-          <div className='loader'></div>
+          <div className='loader3 mt-[40vh]'></div>
         )
       ) : (
         posts ? (
@@ -28,7 +27,7 @@ const Posts = () => {
             ))}
           </>
         ) : (
-          <div className='loader'></div>
+          <div className='loader3 mt-[40vh]'></div>
         )
       )}
     </div>

@@ -56,38 +56,45 @@ const SuggestedUsers = () => {
         <div className='my-10'>
             <div className='flex items-center justify-between text-sm'>
                 <h1 className='font-semibold text-gray-600'>Suggested for you</h1>
-                <span className='font-medium cursor-pointer'>See All</span>
+                {/* <span className='font-medium cursor-pointer'>See All</span> */}
             </div>
-            {suggestedUsers?.map((suggested) => (
-                <div key={suggested._id} className='flex items-center justify-between my-5'>
-                    <div className='flex items-center gap-2 mr-3'>
-                        <Link to={`/profile/${suggested?._id}`}>
-                            {/* <Avatar>
-                                <AvatarImage src={suggested?.profilePicture} alt="post_image" />
-                                <AvatarFallback className="text-white">{suggested?.username[0]}</AvatarFallback>
-                            </Avatar> */}
-                            <Profilepic url={suggested?.profilePicture}/>
-                        </Link>
-                        <div>
-                            <h1 className='font-semibold text-sm'>
-                                <Link to={`/profile/${suggested?._id}`}>{suggested?.username}</Link>
-                            </h1>
-                            <span className='text-gray-600 text-sm'>{suggested?.bio || 'Bio here...'}</span>
+            { suggestedUsers?.length ? (
+                suggestedUsers?.map((suggested) => (
+                    <div key={suggested._id} className='flex items-center justify-between my-5'>
+                        <div className='flex items-center gap-2 mr-3'>
+                            <Link to={`/profile/${suggested?._id}`}>
+                                {/* <Avatar>
+                                    <AvatarImage src={suggested?.profilePicture} alt="post_image" />
+                                    <AvatarFallback className="text-white">{suggested?.username[0]}</AvatarFallback>
+                                    </Avatar> */}
+                                <Profilepic url={suggested?.profilePicture}/>
+                            </Link>
+                            <div>
+                                <h1 className='font-semibold text-sm'>
+                                    <Link to={`/profile/${suggested?._id}`}>{suggested?.username}</Link>
+                                </h1>
+                                <span className='text-gray-600 text-sm'>{suggested?.bio || 'Bio here...'}</span>
+                            </div>
                         </div>
+                        <span 
+                            className='text-[#3BADF8] text-xs font-bold cursor-pointer hover:text-[#3495d6] flex items-center'
+                            onClick={() => followOrUnfollow(suggested?._id)}
+                            disabled={loadingState[suggested._id]} 
+                            >
+                            {loadingState[suggested._id] ? (
+                                <span className="loader2"></span>
+                            ) : (
+                                suggested.followers.includes(user?._id) ? 'Unfollow' : 'Follow'
+                            )}
+                        </span>
                     </div>
-                    <span 
-                        className='text-[#3BADF8] text-xs font-bold cursor-pointer hover:text-[#3495d6] flex items-center'
-                        onClick={() => followOrUnfollow(suggested?._id)}
-                        disabled={loadingState[suggested._id]} 
-                    >
-                        {loadingState[suggested._id] ? (
-                            <span className="loader2"></span>
-                        ) : (
-                            suggested.followers.includes(user?._id) ? 'Unfollow' : 'Follow'
-                        )}
-                    </span>
-                </div>
-            ))}
+                ))) :
+                    (
+                    <div className='h-[80vh] flex items-center justify-center'>
+                     <span className='loader3'></span>
+                    </div>
+                    )
+                }
 
             {/* CSS Overrides for Loader */}
             <style>
