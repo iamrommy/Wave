@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useLayoutEffect, useState } from 'react'
 // import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar'
 import { Dialog, DialogContent, DialogTrigger } from './ui/dialog'
 import { Bookmark, MessageCircle, MoreHorizontal, Send } from 'lucide-react'
@@ -36,6 +36,11 @@ const Post = ({ post, whichPost}) => {
             setText("");
         }
     }
+
+    const {openPost} = useSelector(store => store.miscelaneous)
+    useLayoutEffect(() => {
+        window.scrollTo(0, 0);
+      }, [openPost]);
 
     const likeOrDislikeHandler = async () => {
         try {
@@ -151,7 +156,7 @@ const Post = ({ post, whichPost}) => {
     return (
         <div className='my-8 w-full max-w-sm mx-auto'>
             <div className='flex items-center justify-between'>
-                <div className='flex items-center gap-2' onClick={()=>{if(whichPost==="profilePost"||whichPost==="profileBookmark"){dispatch(setActiveTab('posts')); dispatch(setOpenPost(null))}}}>
+                <div className='flex items-center gap-2' onClick={()=>/*{if(whichPost==="profilePost"||whichPost==="profileBookmark")*/{dispatch(setActiveTab('posts')); dispatch(setOpenPost(null))}}>
                     <Link to={`/profile/${post?.author?._id}`}>
                         {/* <Avatar>
                             <AvatarImage src={post.author?.profilePicture} alt="post_image" />

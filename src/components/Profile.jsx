@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState ,useLayoutEffect} from 'react';
 // import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import useGetUserProfile from '@/hooks/useGetUserProfile';
 import { Link, useParams } from 'react-router-dom';
@@ -32,9 +32,13 @@ const Profile = () => {
   const isLoggedInUserProfile = user?._id === userProfile?._id;
   
   useEffect(()=>{
-    dispatch(setActiveTab('posts')); dispatch(setOpenPost(null))
+    dispatch(setActiveTab('posts')); 
+    dispatch(setOpenPost(null))
+    window.scrollTo(0, 0);
     return ()=>{
       dispatch(setUserProfile(null));
+      dispatch(setActiveTab('posts')); 
+      dispatch(setOpenPost(null))
     }
   },[]);
   
@@ -99,12 +103,12 @@ const Profile = () => {
     }
   };
 
-  useEffect(() => {
-    if (openPost && postRefs.current[openPost._id]) {
-      postRefs.current[openPost._id].scrollIntoView({ behavior: "smooth", block: "start" });
-    }
-  }, [openPost]);
-  
+useLayoutEffect(() => {
+  if (openPost && postRefs.current[openPost._id]) {
+      window.scrollTo(0, 0);
+      postRefs.current[openPost._id].scrollIntoView({ block: "center" });
+  }
+}, [openPost]);  
 
   const displayedPost = activeTab === 'posts' ? userProfile?.posts : userProfile?.bookmarks;
 
@@ -244,12 +248,14 @@ const Profile = () => {
         ) : (
           displayedPost && (
             <div className='flex-1 my-8 flex flex-col pl-[20%]'>
-              <div onClick={() => dispatch(setOpenPost(null))} className='flex hover:bg-gray-800 hover:text-white p-2 pr-3 rounded-full w-min cursor-pointer gap-2'>
+              <div onClick={() => dispatch(setOpenPost(null))} className='flex hover:bg-gray-800 hover:text-white p-2 pr-3 rounded-full w-min cursor-pointer gap-2 fixed'>
                 <IoArrowBack className='text-xl mt-1'/>
                 <span className='text-lg font-semibold'>Profile </span>
               </div>
               {displayedPost?.map((p) => (
-                <Post key={p._id} post={p} whichPost={activeTab === 'posts' ? "profilePost" : "profileBookmark"} ref={(el) => (postRefs.current[p._id] = el)} />
+                <div ref={(el) => (postRefs.current[p._id] = el)}  key={p._id}>
+                  <Post post={p} whichPost={activeTab === 'posts' ? "profilePost" : "profileBookmark"} />
+                </div>
               ))}
             </div>
           )

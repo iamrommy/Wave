@@ -1,24 +1,32 @@
-import React from 'react'
-// import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar'
-import { Link } from 'react-router-dom'
-import Profilepic from './ui/profilepic'
+import React from 'react';
+import { Link } from 'react-router-dom';
+import Profilepic from './ui/profilepic';
+import { setActiveTab, setOpenPost } from '../redux/miscelaneousSlice';
+import { useDispatch } from 'react-redux';
 
 const Comment = ({ comment }) => {
-    // console.log(comment);
+    const dispatch = useDispatch();
+
+    const handleClick = () => {
+        dispatch(setActiveTab('posts'));
+        dispatch(setOpenPost(null));
+        window.scrollTo(0, 0); 
+    };
+
     return (
         <div className='my-2'>
-            <div className='flex gap-3 items-center'>
+            <div className='flex gap-3 items-center' onClick={handleClick}>
                 <Link to={`/profile/${comment?.author?._id}`}>
-                {/* <Avatar>
-                    <AvatarImage src={comment?.author?.profilePicture} />
-                    <AvatarFallback>{comment?.author?.username[0]}</AvatarFallback>
-                </Avatar> */}
-                <Profilepic url={comment?.author?.profilePicture}/>
+                    <Profilepic url={comment?.author?.profilePicture} />
                 </Link>
-                <h1 className='font-bold text-sm'>{comment?.author.username} <span className='font-normal pl-1'>{comment?.text}</span></h1>
+                <h1 className='font-bold text-sm'>
+                    {comment?.author.username}
+                    <span className='font-normal pl-1'>{comment?.text}</span>
+                </h1>
             </div>
         </div>
-    )
-}
+    );
+};
 
-export default Comment
+export default Comment;
+
