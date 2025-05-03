@@ -452,7 +452,6 @@ const followOrUnfollow = async (req, res) => {
         })
         .populate('followers')
         .populate('following')
-        .populate('likes')
         .exec();
 
         return res.status(200).json({ 
