@@ -294,6 +294,7 @@ exports.getRecommendedPosts = async (req, res) => {
     res.json({ success: true, posts: populated });
 
   } catch (err) {
+    
     console.error('Error in explore feed:', err);
     res.status(500).json({ success: false, message: 'Server error' });
   }

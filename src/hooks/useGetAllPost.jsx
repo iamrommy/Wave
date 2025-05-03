@@ -12,7 +12,7 @@ const useGetAllPost = (page) => {
     const fetchAllPosts = async () => {
       dispatch(setLoading(true));
       try {
-        console.log('here1')
+        // console.log('here1')
         const res = await axios.get( `${import.meta.env.VITE_APP_BASE_URL}/post/all?page=${page}`, { withCredentials: true });
         console.log('here2', res);
         if (res.data.success) {
