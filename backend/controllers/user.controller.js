@@ -1,7 +1,7 @@
 const User = require("../models/user.model.js");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const getDataUri = require("../utils/datauri.js");
+// const getDataUri = require("../utils/datauri.js");
 const sharp = require('sharp');
 const fs = require('fs');
 const cloudinary = require("../utils/cloudinary.js");
@@ -88,7 +88,7 @@ const login = async (req, res) => {
             gender: user?.gender,
             followers: user.followers,
             following: user.following,
-            posts: populatedPosts
+            posts: populatedPosts,
         };
         return res.cookie('token', token, { 
             httpOnly: true, 
@@ -134,6 +134,10 @@ const getProfile = async (req, res) => {
                             path: 'author',
                             select: 'username profilePicture _id'
                         }
+                    },
+                    {
+                        path: 'likes',
+                        options: { sort: { createdAt: -1 } }
                     }
                 ]
             })
@@ -151,6 +155,10 @@ const getProfile = async (req, res) => {
                             path: 'author',
                             select: 'username profilePicture _id'
                         }
+                    },
+                    {
+                        path: 'likes',
+                        options: { sort: { createdAt: -1 } }
                     }
                 ]
             })
@@ -403,6 +411,7 @@ const followOrUnfollow = async (req, res) => {
         })
         .populate('followers')
         .populate('following')
+        .populate('likes')
         .exec();
             
         
@@ -443,6 +452,7 @@ const followOrUnfollow = async (req, res) => {
         })
         .populate('followers')
         .populate('following')
+        .populate('likes')
         .exec();
 
         return res.status(200).json({ 
@@ -485,5 +495,49 @@ const searchUser = async (req, res) => {
     }
   };  
   
+const rateUser = async (req, res) => {
+  try {
+    const { userId } = req.body; // the user being rated
+    const { value } = req.body;    // rating value (1 to 5)
+    const raterId = req.id;  // assuming user is authenticated
 
-module.exports = { register, login, logout, getProfile, editProfile, getSuggestedUsers, followOrUnfollow, searchUser };
+    if (value < 0 || value > 10) {
+      return res.status(400).json({ message: "Rating must be between 0 and 10." });
+    }
+
+    const userToRate = await User.findById(userId);
+    if (!userToRate) {
+      return res.status(404).json({ message: "User not found." });
+    }
+
+    const existingRating = userToRate.ratings.find(
+      (r) => r.user.toString() === raterId.toString()
+    );
+
+    if (existingRating) {
+      existingRating.value = value;
+    } else {
+      userToRate.ratings.push({ user: raterId, value });
+    }
+
+    // Recalculate average
+    const total = userToRate.ratings.reduce((sum, r) => sum + r.value, 0);
+    userToRate.averageRating = total / userToRate.ratings.length;
+
+    await userToRate.save();
+
+    res.status(200).json({ 
+      success: true,
+      message: "Rating submitted successfully.",
+      averageRating: userToRate.averageRating.toFixed(2),
+      ratings: userToRate.ratings
+    });
+
+  } catch (error) {
+    console.error("Rating Error:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+
+module.exports = { register, login, logout, getProfile, editProfile, getSuggestedUsers, followOrUnfollow, searchUser, rateUser };

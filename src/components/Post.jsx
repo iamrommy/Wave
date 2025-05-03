@@ -1,6 +1,6 @@
 import React, { useLayoutEffect, useState } from 'react'
 // import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar'
-import { Dialog, DialogContent, DialogTrigger } from './ui/dialog'
+import { Dialog, DialogContent, DialogTrigger, DialogHeader} from './ui/dialog'
 import { Bookmark, MessageCircle, MoreHorizontal, Send } from 'lucide-react'
 import { FaBookmark, FaRegBookmark  } from "react-icons/fa";
 import { Button } from './ui/button'
@@ -23,6 +23,7 @@ const Post = ({ post, whichPost}) => {
     const { user, userProfile} = useSelector(store => store.auth);
     // console.log(user);
     const { posts, feedPosts } = useSelector(store => store.post);
+    const [openDialog, setOpenDialog] = useState(false);
     const [liked, setLiked] = useState(post.likes.includes(user?._id) || false);
     const [postLike, setPostLike] = useState(post.likes.length);
     const dispatch = useDispatch();
@@ -39,7 +40,7 @@ const Post = ({ post, whichPost}) => {
 
     const {openPost} = useSelector(store => store.miscelaneous)
     useLayoutEffect(() => {
-        if (openPost) {
+        if (openPost && whichPost !== "recommendedPosts") {
             window.scrollTo(0, 0);
         }
     }, [openPost]);
@@ -210,7 +211,7 @@ const Post = ({ post, whichPost}) => {
                     : (<FaRegBookmark  onClick={bookmarkHandler} className='cursor-pointer hover:text-gray-600' /> )
                 }
             </div>
-            <span className='font-medium block mb-2'>{postLike} likes</span>
+            <span onClick={()=>setOpenDialog(true)} className='font-medium block mb-2 cursor-pointer'>{postLike} likes</span>
             <p>
                 <span className='font-medium mr-2'>{post.author?.username}</span>
                 {post.caption}
@@ -237,6 +238,38 @@ const Post = ({ post, whichPost}) => {
                 }
 
             </div>
+
+            <Dialog open={openDialog}>
+              <DialogContent
+                onInteractOutside={() => setOpenDialog(false)}
+                aria-describedby={undefined}
+              >
+                <DialogHeader className="text-center font-semibold text-white">
+                  Likes
+                </DialogHeader>
+                <div
+                  id="dialog-description"
+                  className="flex flex-col gap-3 max-h-80 overflow-y-auto"
+                >
+                  {post?.likes?.length > 0 ? (
+                    post?.likes.map((dialogUser) => {
+                      return (
+                        <div key={dialogUser._id+"H"} className="flex items-center gap-3 justify-between">
+                          <Link className="flex items-center gap-3" to={`/profile/${dialogUser?._id}`} onClick={() => setOpenDialog(false)}>
+                
+                            <Profilepic url={dialogUser?.profilePicture} classes={'h-10 w-10'}/>
+                            <span className="text-white">{dialogUser.username}</span>
+                          </Link>
+                        </div>
+                      );
+                    })
+                  ) : (
+                    <p className="text-gray-400 text-center">No likes</p>
+                  )}
+                </div>
+              </DialogContent>
+            </Dialog>
+
         </div>
     )
 }

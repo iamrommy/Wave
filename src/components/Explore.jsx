@@ -37,7 +37,7 @@ const Explore = () => {
 
   useLayoutEffect(() => {
     if (openPost && postRefs.current[openPost._id]) {
-        window.scrollTo(0, 0);
+        // window.scrollTo(0, 0);
         postRefs.current[openPost._id].scrollIntoView({ block: "center" });
     }
   }, [openPost]); 
@@ -87,6 +87,12 @@ const Explore = () => {
                         </div>
                       ))}
                     </div>
+                    {
+                      loading &&
+                      <div className='h-32 pl-32 flex items-center justify-center'>
+                        <span className='loader3'></span>
+                      </div>
+                    }
                   </>
                 )}
               </div>

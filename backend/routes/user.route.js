@@ -7,7 +7,8 @@ const {
     login, 
     logout, 
     register,
-    searchUser
+    searchUser,
+    rateUser
 } = require("../controllers/user.controller.js");
 const isAuthenticated = require("../middlewares/isAuthenticated.js");
 const upload = require("../middlewares/multer.js");
@@ -21,6 +22,7 @@ router.route('/:id/profile').get(isAuthenticated, getProfile);
 router.route('/profile/edit').post(isAuthenticated, upload.single('profilePhoto'), editProfile);
 router.route('/suggested').get(isAuthenticated, getSuggestedUsers);
 router.route('/followorunfollow/:id').post(isAuthenticated, followOrUnfollow);
+router.route('/rate').post(isAuthenticated, rateUser);
 router.route('/search').get(searchUser);
 
 module.exports = router;

@@ -107,190 +107,6 @@ exports.getAllPost = async (req, res) => {
     }
 };
 
-// exports.getRecommendedPosts = async (req, res) => {
-//   try {
-//     const userId = req.id;
-//     const interactions = await UserPostInteraction.find({ userId });
-
-//     // If no interactions, return 60 random posts (populated)
-//     if (interactions.length === 0) {
-//       const randomPosts = await Post.aggregate([{ $sample: { size: 60 } }]);
-//       const populated = await Post.populate(randomPosts, [
-//         {
-//             path: 'author',
-//             select: 'username profilePicture'
-//         },
-//         {
-//             path: 'comments',
-//             options: { sort: { createdAt: 1 } },
-//             populate: {
-//                 path: 'author',
-//                 select: 'username profilePicture'
-//             }
-//         }
-//       ]);
-//       return res.json({ success: true, posts: populated });
-//     }
-
-//     const hashtagScores = {};
-//     const now = Date.now();
-
-//     for (let { postId, score, createdAt } of interactions) {
-//       const post = await Post.findById(postId).select("caption");
-//       if (!post) continue;
-
-//       const tags = extractHashtags(post.caption);
-//       const timeDecay = Math.exp(-(now - new Date(createdAt)) / (1000 * 3600 * 24 * 7)); // 7-day decay
-
-//       for (let tag of tags) {
-//         hashtagScores[tag] = (hashtagScores[tag] || 0) + score * timeDecay;
-//       }
-//     }
-
-//     const sortedTags = Object.entries(hashtagScores).sort((a, b) => b[1] - a[1]);
-//     const topHashtags = sortedTags.slice(0, 5).map(([tag]) => tag);
-//     const secondaryHashtags = sortedTags.slice(5).map(([tag]) => tag);
-
-//     // High-interest: 25 posts
-//     const highInterest = await Post.aggregate([
-//       {
-//         $addFields: {
-//           tags: {
-//             $map: {
-//               input: {
-//                 $filter: {
-//                   input: { $split: ['$caption', ' '] },
-//                   as: 'w',
-//                   cond: { $regexMatch: { input: '$$w', regex: /^#/ } }
-//                 }
-//               },
-//               as: 'tag',
-//               in: { $toLower: '$$tag' }
-//             }
-//           }
-//         }
-//       },
-//       {
-//         $addFields: {
-//           matchCount: {
-//             $size: {
-//               $filter: {
-//                 input: '$tags',
-//                 as: 't',
-//                 cond: { $in: ['$$t', topHashtags] }
-//               }
-//             }
-//           }
-//         }
-//       },
-//       { $match: { matchCount: { $gt: 0 } } },
-//       { $sort: { matchCount: -1, createdAt: -1 } },
-//       { $limit: 25 }
-//     ]);
-
-//     // Medium-interest: 5 posts
-//     let mediumInterest = [];
-//     if (secondaryHashtags.length) {
-//       mediumInterest = await Post.aggregate([
-//         {
-//           $match: {
-//             caption: {
-//               $regex: secondaryHashtags.join('|'),
-//               $options: 'i'
-//             }
-//           }
-//         },
-//         { $sample: { size: 5 } }
-//       ]);
-//     }
-
-//     // Trending: 15 posts
-//     const trendingPosts = await Post.find({
-//       createdAt: { $gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) }
-//     })
-//       .sort({ likesCount: -1, commentsCount: -1 })
-//       .limit(15);
-
-//     // Serendipity: 20 posts
-//     const seenTags = new Set([...topHashtags, ...secondaryHashtags]);
-//     const serendipity = await Post.aggregate([
-//       {
-//         $addFields: {
-//           tags: {
-//             $map: {
-//               input: {
-//                 $filter: {
-//                   input: { $split: ['$caption', ' '] },
-//                   as: 'w',
-//                   cond: { $regexMatch: { input: '$$w', regex: /^#/ } }
-//                 }
-//               },
-//               as: 'tag',
-//               in: { $toLower: '$$tag' }
-//             }
-//           }
-//         }
-//       },
-//       {
-//         $match: {
-//           tags: {
-//             $elemMatch: {
-//               $nin: Array.from(seenTags)
-//             }
-//           }
-//         }
-//       },
-//       { $sample: { size: 20 } }
-//     ]);
-
-//     // Combine and dedupe
-//     const seen = new Set();
-//     const combined = [...highInterest, ...mediumInterest, ...trendingPosts, ...serendipity];
-//     const deduped = combined.filter(post => {
-//       const id = post._id.toString();
-//       if (seen.has(id)) return false;
-//       seen.add(id);
-//       return true;
-//     });
-
-//     // Shuffle
-//     for (let i = deduped.length - 1; i > 0; i--) {
-//       const j = Math.floor(Math.random() * (i + 1));
-//       [deduped[i], deduped[j]] = [deduped[j], deduped[i]];
-//     }
-
-//     let finalPosts = deduped.slice(0, 60);
-
-//     // If nothing matched, fallback to 60 random
-//     if (finalPosts.length === 0) {
-//       const fallback = await Post.aggregate([{ $sample: { size: 60 } }]);
-//       finalPosts = fallback;
-//     }
-
-//     const populated = await Post.populate(finalPosts, [
-//       {
-//           path: 'author',
-//           select: 'username profilePicture'
-//       },
-//       {
-//           path: 'comments',
-//           options: { sort: { createdAt: 1 } },
-//           populate: {
-//               path: 'author',
-//               select: 'username profilePicture'
-//           }
-//       }
-//   ]);
-
-//     res.json({ success: true, posts: populated });
-
-//   } catch (err) {
-//     console.error('Error in explore feed:', err);
-//     res.status(500).json({ success: false, message: 'Server error' });
-//   }
-// };
-
-
 exports.getRecommendedPosts = async (req, res) => {
   try {
     const userId = req.id;
@@ -312,7 +128,11 @@ exports.getRecommendedPosts = async (req, res) => {
             path: 'author',
             select: 'username profilePicture'
           }
-        }
+        },
+        {
+          path: 'likes',
+          options: { sort: { createdAt: 1 } }
+        } 
       ]);
       return res.json({ success: true, posts: populated });
     }
@@ -464,6 +284,10 @@ exports.getRecommendedPosts = async (req, res) => {
               path: 'author',
               select: 'username profilePicture'
           }
+      },
+      {
+         likes: 'likes',
+         options: {sort: {createdAt: 1}},
       }
   ]);
 
@@ -488,7 +312,8 @@ exports.getUserPost = async (req, res) => {
                 path: 'author',
                 select: 'username profilePicture'
             }
-        });
+        }).populate({path: 'likes', sort:{createdAt:1}})
+        ;
         return res.status(200).json({
             posts,
             success: true
@@ -525,7 +350,7 @@ exports.getFeedPost = async (req, res) => {
                   path: 'author',
                   select: 'username profilePicture'
               }
-          });
+          }).populate({path: 'likes', options:{sort:{createdAt:1}}});
 
       // 🔀 Shuffle
       for (let i = posts.length - 1; i > 0; i--) {

@@ -12,6 +12,7 @@ import { setActiveTab, setOpenPost } from '../redux/miscelaneousSlice';
 import { Dialog, DialogContent, DialogHeader } from './ui/dialog';
 import Profilepic from './ui/profilepic';
 import Post from './Post';
+import Rating from './Rating';
 
 const Profile = () => {
   const params = useParams();
@@ -115,9 +116,9 @@ useLayoutEffect(() => {
             
             {
               userProfile ? (
-                <div className='flex flex-col gap-20 p-8'>
+                <div className='flex flex-col gap-5 p-8'>
                 <div className='grid grid-cols-2'>
-                  <section className='flex items-center justify-center'>
+                  <section className='flex flex-col items-center justify-center'>
                     {/* <Avatar className='h-32 w-32'>
                       {userProfile?.profilePicture ? (
                       <AvatarImage src={userProfile.profilePicture} alt="profilephoto" />
@@ -125,6 +126,7 @@ useLayoutEffect(() => {
                       <AvatarFallback className="text-white">{userProfile.username[0]}</AvatarFallback>
                     </Avatar> */}
                     <Profilepic url={userProfile?.profilePicture} classes={'h-32 w-32'}/>
+                    <Rating/>
                   </section>
                   <section>
                     <div className='flex flex-col gap-5'>
@@ -158,6 +160,7 @@ useLayoutEffect(() => {
                       <div className='flex flex-col gap-1'>
                         <span className='font-semibold'>{userProfile?.bio || 'bio here...'}</span>
                       </div>
+        
                     </div>
                   </section>
                 </div>
