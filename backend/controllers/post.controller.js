@@ -112,7 +112,7 @@ exports.getRecommendedPosts = async (req, res) => {
     const userId = req.id;
     const page = parseInt(req.query.page) || 0;
     const interactions = await UserPostInteraction.find({ userId });
-    console.log('here11', page, userId);
+
     if (interactions.length === 0) {
       const randomPosts = await Post.aggregate([{ $sample: { size: 60 * (page + 1) } }]);
       const paginated = randomPosts.slice(page * 60, (page + 1) * 60);
@@ -136,7 +136,7 @@ exports.getRecommendedPosts = async (req, res) => {
       ]);
       return res.json({ success: true, posts: populated });
     }
-    console.log('here33');
+
     const hashtagScores = {};
     const now = Date.now();
 
@@ -286,11 +286,11 @@ exports.getRecommendedPosts = async (req, res) => {
           }
       },
       {
-         likes: 'likes',
+         path: 'likes',
          options: {sort: {createdAt: 1}},
       }
   ]);
-  console.log('here33',populated)
+
     res.json({ success: true, posts: populated });
 
   } catch (err) {
