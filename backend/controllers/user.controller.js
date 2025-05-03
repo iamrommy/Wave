@@ -367,13 +367,84 @@ const followOrUnfollow = async (req, res) => {
 
         // Populate targetUser's followers and following
         targetUser = await User.findById(jiskoFollowKrunga)
-            .populate('followers')
-            .populate('following');
+        .populate({
+            path: 'posts',
+            options: { sort: { createdAt: -1 } },
+            populate: [
+                {
+                    path: 'author',
+                    select: 'username profilePicture _id'
+                },
+                {
+                    path: 'comments',
+                    populate: {
+                        path: 'author',
+                        select: 'username profilePicture _id'
+                    }
+                }
+            ]
+        })
+        .populate({
+            path: 'bookmarks',
+            options: { sort: { createdAt: -1 } },
+            populate: [
+                {
+                    path: 'author',
+                    select: 'username profilePicture _id'
+                },
+                {
+                    path: 'comments',
+                    populate: {
+                        path: 'author',
+                        select: 'username profilePicture _id'
+                    }
+                }
+            ]
+        })
+        .populate('followers')
+        .populate('following')
+        .exec();
+            
         
         user = await User.findById(followKrneWala)
-            .populate('followers')
-            .populate('following');
-        
+        .populate({
+            path: 'posts',
+            options: { sort: { createdAt: -1 } },
+            populate: [
+                {
+                    path: 'author',
+                    select: 'username profilePicture _id'
+                },
+                {
+                    path: 'comments',
+                    populate: {
+                        path: 'author',
+                        select: 'username profilePicture _id'
+                    }
+                }
+            ]
+        })
+        .populate({
+            path: 'bookmarks',
+            options: { sort: { createdAt: -1 } },
+            populate: [
+                {
+                    path: 'author',
+                    select: 'username profilePicture _id'
+                },
+                {
+                    path: 'comments',
+                    populate: {
+                        path: 'author',
+                        select: 'username profilePicture _id'
+                    }
+                }
+            ]
+        })
+        .populate('followers')
+        .populate('following')
+        .exec();
+
         return res.status(200).json({ 
             message: isFollowing ? 'Unfollowed successfully' : 'Followed successfully',
             success: true,

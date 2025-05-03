@@ -18,7 +18,6 @@ import { Link } from 'react-router-dom';
 import { setFeedPosts } from '../redux/postSlice';
 
 const Post = ({ post, whichPost}) => {
-    // console.log(post);
     const [text, setText] = useState("");
     const [open, setOpen] = useState(false);
     const { user, userProfile} = useSelector(store => store.auth);
@@ -27,6 +26,7 @@ const Post = ({ post, whichPost}) => {
     const [liked, setLiked] = useState(post.likes.includes(user?._id) || false);
     const [postLike, setPostLike] = useState(post.likes.length);
     const dispatch = useDispatch();
+    const [loading, setLoading] = useState(false);
 
     const changeEventHandler = (e) => {
         const inputText = e.target.value;
@@ -39,9 +39,11 @@ const Post = ({ post, whichPost}) => {
 
     const {openPost} = useSelector(store => store.miscelaneous)
     useLayoutEffect(() => {
-        window.scrollTo(0, 0);
-      }, [openPost]);
-
+        if (openPost) {
+            window.scrollTo(0, 0);
+        }
+    }, [openPost]);
+    
     const likeOrDislikeHandler = async () => {
         try {
             const action = liked ? 'dislike' : 'like';
@@ -169,21 +171,21 @@ const Post = ({ post, whichPost}) => {
                        {user?._id === post.author._id &&  <Badge variant="secondary">Author</Badge>}
                     </div>
                 </div>
+                { post?.author?._id === user?._id && 
                 <Dialog>
                     <DialogTrigger asChild>
                         <MoreHorizontal className='cursor-pointer' />
                     </DialogTrigger>
                     <DialogContent className="flex flex-col items-center text-sm text-center text-gray-400">
-                        {
+                        {/* {
                         post?.author?._id !== user?._id && <Button variant='ghost' className="cursor-pointer w-fit text-[#ED4956] font-bold">Unfollow</Button>
-                        }
-                        
-                        <Button variant='ghost' className="cursor-pointer w-fit">Add to favorites</Button>
+                        } */}
                         {
                             user && user?._id === post?.author._id && <Button onClick={deletePostHandler} variant='ghost' className="cursor-pointer w-fit">Delete</Button>
                         }
                     </DialogContent>
                 </Dialog>
+                }
             </div>
             <img
                 className='rounded-sm my-2 w-full aspect-square object-cover'

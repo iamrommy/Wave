@@ -14,12 +14,13 @@ import { setOnlineUsers } from './redux/chatSlice'
 import { setLikeNotification } from './redux/rtnSlice'
 import ProtectedRoutes from './components/ProtectedRoutes'
 import Explore from './components/Explore'
+import BackToTopButton from './components/ui/backToTop'
 
 
 const browserRouter = createBrowserRouter([
   {
     path: "/",
-    element: <ProtectedRoutes><MainLayout /></ProtectedRoutes>,
+    element: <ProtectedRoutes><MainLayout /> <BackToTopButton/></ProtectedRoutes>,
     children: [
       {
         path: '/',

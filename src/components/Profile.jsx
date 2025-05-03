@@ -74,12 +74,7 @@ const Profile = () => {
           dispatch(setUserProfile(updatedTargetUserData));
         }
         if(profileType === "anotherProfile" && params.id === user?._id){ //if call is made from dialog box and the userProfile is my own profile
-          const updatedTargetUserData = {
-            ...user,
-            following: res.data.user?.following,
-            followers: res.data.user?.followers,
-          };
-          dispatch(setUserProfile(updatedTargetUserData));
+          dispatch(setUserProfile(res?.data?.user))
         }
 
         const updatedUserData = { // to update my own profile

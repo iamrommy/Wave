@@ -3,7 +3,7 @@ import Post from './Post'
 import { useSelector } from 'react-redux'
 
 const Posts = () => {
-  const { posts, feedPosts} = useSelector(store => store.post);
+  const { posts, feedPosts, loading} = useSelector(store => store.post);
   const { user } = useSelector(store => store.auth);
   return (
     <div>
@@ -14,6 +14,7 @@ const Posts = () => {
             {feedPosts.map((post) => (
               <Post key={post._id} post={post} whichPost="feedPosts"/>
             ))}
+            {loading && <div className='w-full flex justify-center h-32'> <span className='loader3 '></span> </div>}
           </>
         ) : (
           <div className='loader3 mt-[40vh]'></div>
@@ -25,6 +26,7 @@ const Posts = () => {
             {posts.map((post) => (
               <Post key={post._id} post={post} whichPost="recommendedPosts"/>
             ))}
+            {loading && <div className='w-full flex justify-center h-32'> <span className='loader3 '></span> </div>}
           </>
         ) : (
           <div className='loader3 mt-[40vh]'></div>
