@@ -136,7 +136,7 @@ exports.getRecommendedPosts = async (req, res) => {
       ]);
       return res.json({ success: true, posts: populated });
     }
-    console.log('here33',paginated);
+    console.log('here33');
     const hashtagScores = {};
     const now = Date.now();
 
