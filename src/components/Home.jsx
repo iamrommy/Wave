@@ -10,7 +10,7 @@ const Home = () => {
     const [page, setPage] = useState(1);
 
     useGetFeedPost(page);
-    useGetAllPost(page, 'fromHome');
+    useGetAllPost(page);
     useGetSuggestedUsers();
 
     const handleInfiniteScroll = async () => {

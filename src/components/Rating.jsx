@@ -36,14 +36,14 @@ const Rating = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }; 
   
   return (
     <div className="flex flex-col sm:flex-row items-center gap-4 mt-4">
       {/* Display average rating */}
       <div className="text-center">
         <span className="font-semibold text-lg mr-1">
-          Rated: {userProfile?.averageRating.toFixed(2) || 0}
+          Rated: {Number(userProfile?.averageRating).toFixed(2) || 0}
         </span>
         <span className="text-sm text-gray-600">
           by {userProfile?.ratings?.length || 0} {userProfile?.ratings?.length > 1 ? "users" : "user"}

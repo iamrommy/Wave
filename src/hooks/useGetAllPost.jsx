@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { setLoading, addPosts } from "@/redux/postSlice";
 import { setPosts } from "../redux/postSlice";
 
-const useGetAllPost = (page, from = '') => {
+const useGetAllPost = (page) => {
   const dispatch = useDispatch();
   const { posts } = useSelector(state => state.post);
 
