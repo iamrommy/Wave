@@ -389,7 +389,7 @@ const followOrUnfollow = async (req, res) => {
                         path: 'author',
                         select: 'username profilePicture _id'
                     }
-                }
+                },
             ]
         })
         .populate({
@@ -411,7 +411,6 @@ const followOrUnfollow = async (req, res) => {
         })
         .populate('followers')
         .populate('following')
-        .populate('likes')
         .exec();
             
         
